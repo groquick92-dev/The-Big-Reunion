@@ -1,0 +1,47 @@
+{
+  "Ardèche GdF": {
+    "status": 200,
+    "url": "https://www.gites-de-france-ardeche.com/location-gites-de-groupe.html",
+    "selectors": {
+      ".fiche": 5,
+      "[class*='gite']": 1,
+      "[class*='fiche']": 5,
+      ".item": 17
+    },
+    "html_chunk": "<div class=\"item itemProd itemListe T gestion-P\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\" data-numheber=\"512\" href=\"javascript:void(0);\" onclick=\"try { ga_trackEvent('Fiche Produit', 'Ajout Selection', '/location-gites-de-groupe.html', 1, 0, true) ; } catch(e) { } ;ajouterAuPanier('gites07_b2026.1.512.SE','1','','afficheRetourAjaxPanier');ajouterClassePanier('512');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<p class=\"p_infoReservableEnligne\"><span class=\"span_reservableEnLigne dispogite\">Réservation en ligne instantanée</span></p>\n<div class=\"vignette\">\n<div class=\"div_sliderMobile\"><div class=\"div_sliderMobileContent\"><a class=\"urlLienFiche\" href=\"/location-Gites-etape-sejour-Tournon-sur-rhone-07G512.html\" target=\"_blank\" title=\"\"><img alt=\"Gite de groupe n°512 Tournon-sur-Rhône - Ar"
+  },
+  "Deux-Sèvres GdF": {
+    "status": 200,
+    "url": "https://www.gites-de-france-deux-sevres.com/gites-groupe.html",
+    "selectors": {
+      "[class*='gite']": 3,
+      ".item": 13
+    },
+    "html_chunk": "<div class=\"item itemProd itemListe T gestion-P\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-numheber=\"1311\" href=\"javascript:void(0);\" onclick=\"ajouterAuPanier('gites79_b2026.1.1311.GE','1','','afficheRetourAjaxPanier');ajouterClassePanier('1311');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<p class=\"p_infoReservableEnligne\"><span class=\"span_reservableEnLigne dispogite\">Réservation en ligne instantanée</span></p>\n<div class=\"vignette\">\n<div class=\"div_sliderMobile\"><div class=\"div_sliderMobileContent\"><a class=\"urlLienFiche\" href=\"/location-vacances-Deux-sevres-Gite-etape-a-Bougon-79G1311.html\" target=\"_blank\" title=\"\"><img alt=\"Gîte de groupe n°1311 Bougon - Deux-Sèvres - photo\" data-defaut=\"/img/css/tranparent-photoHeber.gif\" data-ident=\"gites79_b2026.1.1311.GE\" data-labelevent=\"20-79-79G1311-21-1-0\" data-original=\"/photos/g"
+  },
+  "PACA GdF": {
+    "status": 200,
+    "url": "https://www.gites-de-france-paca.com/liste.html?gitegroupe=o",
+    "selectors": {
+      ".fiche": 8,
+      "[class*='gite']": 4,
+      "[class*='fiche']": 8,
+      ".item": 30
+    },
+    "html_chunk": "<div class=\"item itemProd itemListe T gestion-P\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-numheber=\"G315011\" href=\"javascript:void(0);\" onclick=\"ajouterAuPanier('gites04_b2026.1.G315011.SE','1','','afficheRetourAjaxPanier');ajouterClassePanier('G315011');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<div class=\"rubriquesPrincipales\">\n<ul class=\"fiche itea_ul ul_rubriques\"><li class=\"paire fiche rubrique_code_THER rubrique_type_LISTE\" data-rubrique=\"THER\"><div class=\"divRubrique_descs rubrique_THER\"><span class=\"span_titreRubrique span_titreRubrique_avec_description\"><span class=\"rubriqueTitre\">Thermalisme</span></span><div class=\"div_rubriqueContentTxt\"><span class=\"rubriqueDesc\">L'hébergement est situé à proximité des eaux thermales (de Digne les Bains ou Gréoux les Bains). Ces Eaux sont recommandées pour le traitement des aff"
+  },
+  "Vendée GdF": {
+    "status": 200,
+    "url": "https://www.gites-de-france-vendee.com/fr/thematiques/gites-groupe-grande-capacite-vendee",
+    "selectors": {},
+    "html_chunk": ""
+  },
+  "Drôme GdF": {
+    "status": 200,
+    "url": "https://www.gites-de-france-drome.com/hebergements-groupe-copains-drome.html",
+    "selectors": {
+      ".item": 7
+    },
+    "html_chunk": "<div class=\"item itemArticle itemListe\">\n<div class=\"avecFond\" data-background=\"/img/pexels-vlada-karpovich-4050430-1655198734.jpg\">\n<a href=\"https://cutt.ly/gJ4y16n\" target=\"_parent\" title=\"Réservez\">\n<div class=\"vignette\">\n<div class=\"btn\">\n<p>\n<span>Réservez</span>\n</p>\n</div>\n</div>\n<div class=\"titreEtDescription\">\n<p class=\"titre\">Avec 2 chambres </p>\n</div>\n</a>\n</div>\n</div>"
+  }
+}

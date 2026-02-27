@@ -1,0 +1,77 @@
+{
+  "https://www.gites-de-france-drome.com": {
+    "status": 200,
+    "final_url": "https://www.gites-de-france-drome.com/",
+    "title": "Gites, chambres d'hotes Drome - Location vacances Drome (26)",
+    "groupe_links": [
+      "#gitegroupe",
+      "https://www.gites-de-france-drome.com/locations-a-valence-et-sa-region.html?instance=gites26&amp;critinit=o&amp;distcomm=20&amp;loc=&amp;gitegroupe=&amp;chambre=&amp;instance=gites26&amp;critinit=o&amp;lieucgi=Valence+Et+Sa+Region&amp;REGION=gites26_3&amp;distcomm=30&amp;urlListe=%2Flocations-a-valence-et-sa-region.html&amp;input-drp-arrival-name=&amp;deb=&amp;input-drp-departure-name=&amp;fin=&amp;nbp_min=2",
+      "https://www.gites-de-france-drome.com/gites-a-regrouper-grande-capacite-drome.html#",
+      "https://www.gites-de-france-drome.com/hebergements-groupe-copains-drome.html"
+    ]
+  },
+  "https://www.gites-de-france-deux-sevres.com": {
+    "status": 200,
+    "final_url": "https://www.gites-de-france-deux-sevres.com/",
+    "title": "Pays Niortais et Marais Poitevin",
+    "groupe_links": [
+      "/gites-groupe.html",
+      "/liste.html?lieu=insee_79350-distcomm_30&gite=o&chambre=o&gitegroupe=o&camping=o&giteenfant=o",
+      "/sejours-thematiques.html#groupeMea257",
+      "/sejours-thematiques.html#groupeMea258"
+    ]
+  },
+  "https://www.gites-de-france-ardeche.com": {
+    "status": 200,
+    "final_url": "https://www.gites-de-france-ardeche.com/",
+    "title": "Location de gites chambres d'hôtes campings - Gîtes de France Ardèche",
+    "groupe_links": [
+      "https://www.gites-de-france-ardeche.com/liste.html?ID=liste&critinit=o&instance=gites07&distcomm=30&urlListe=liste&nbp_min=2&ges=&avis=&ani=&gite=n&chambre=n&gitegroupe=n&tour_han=&cha=&c_ecogites=n&n",
+      "https://www.gites-de-france-ardeche.com/liste.html?instance=gites07&critinit=o&distcomm=20&loc=&chambre=&gitegroupe=&en_promo=&instance=gites07&critinit=o&lieucgi=&distcomm=30&urlListe=liste&input-drp",
+      "#gitegroupe",
+      "/location-gites-de-groupe.html",
+      "https://www.gites-de-france-ardeche.com/liste.html?ID=liste&critinit=o&instance=gites07&distcomm=30&urlListe=liste&nbp_min=2&ges=&avis=&ani=&gite=n&chambre=n&gitegroupe=n&tour_han=&cha=o&c_ecogites=n&"
+    ]
+  },
+  "https://www.gites-de-france-paca.com": {
+    "status": 200,
+    "final_url": "https://www.gites-de-france-paca.com/",
+    "title": "Accueil, Gîtes de France Provence Alpes Côte d'Azur",
+    "groupe_links": [
+      "/liste.html?gitegroupe=o",
+      "/le-gite-de-groupe-en-provence-alpes-cote-d-azur.html"
+    ]
+  },
+  "https://gites-de-france-calvados.fr": {
+    "status": "ERROR",
+    "error": "HTTPSConnectionPool(host='gites-de-france-calvados.fr', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='gites-de-france-calvados.fr', port=443): Failed to resolve 'gites-de-france-calvados.fr' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  "https://www.gites-de-france-bretagne.com": {
+    "status": 403,
+    "final_url": "https://www.gites-de-france-bretagne.com/",
+    "title": "?",
+    "groupe_links": []
+  },
+  "https://www.gites-de-france-charente-maritime.com": {
+    "status": "ERROR",
+    "error": "HTTPSConnectionPool(host='www.gites-de-france-charente-maritime.com', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.gites-de-france-charente-maritime.com', port=443): Failed to resolve 'www.gites-de-france-charente-maritime.com' ([Errno 11001] getaddrinfo failed)\"))"
+  },
+  "https://www.gites-de-france-vendee.com": {
+    "status": 200,
+    "final_url": "https://www.gites-de-france-vendee.com/fr",
+    "title": "Location vacances Vendée, des gîtes et chambres d&#x27;hôtes pour vos séjours en",
+    "groupe_links": [
+      "/fr/thematiques/gites-groupe-grande-capacite-vendee"
+    ]
+  },
+  "https://www.gites-de-france-herault.fr": {
+    "status": 200,
+    "final_url": "https://www.gites-de-france-herault.fr/",
+    "title": "?",
+    "groupe_links": []
+  },
+  "https://www.gites-de-france-lot.com": {
+    "status": "ERROR",
+    "error": "('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None))"
+  }
+}
