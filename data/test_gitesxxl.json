@@ -1,0 +1,113 @@
+{
+  "total": 60,
+  "samples": [
+    {
+      "nom": "L'abri",
+      "localisation": "Le Village, 07450 Sagnes-et-Goudoulet — Ardèche",
+      "capacite": 12,
+      "photo": false,
+      "prix": null,
+      "description": "2 dortoirs de 6 personnes Propriétaire de ce grand gîte ?",
+      "equipements": []
+    },
+    {
+      "nom": "Côté Cour, Côté Jardin",
+      "localisation": "319 Vieille Route de Lagorce, 07150 Vallon-Pont-d'Arc — Ardè",
+      "capacite": 12,
+      "photo": false,
+      "prix": null,
+      "description": "5 chambres, piscine Propriétaire de ce grand gîte ?",
+      "equipements": [
+        "Piscine"
+      ]
+    },
+    {
+      "nom": "Gîte Philippon",
+      "localisation": "225 Philipon, 07410 Saint-Félicien — Ardèche",
+      "capacite": 12,
+      "photo": false,
+      "prix": null,
+      "description": "Propriétaire de ce grand gîte ?",
+      "equipements": []
+    },
+    {
+      "nom": "Le grand Cool Douce",
+      "localisation": "Les Clairières, 07260 Joyeuse — Ardèche",
+      "capacite": 14,
+      "photo": false,
+      "prix": null,
+      "description": "4 chambres, piscine Propriétaire de ce grand gîte ?",
+      "equipements": [
+        "Piscine"
+      ]
+    },
+    {
+      "nom": "Le Mazet Saint-Michel",
+      "localisation": "Le Serre, 07210 Rochessauve — Ardèche",
+      "capacite": 14,
+      "photo": false,
+      "prix": null,
+      "description": "5 chambres, piscine Propriétaire de ce grand gîte ?",
+      "equipements": [
+        "Piscine"
+      ]
+    },
+    {
+      "nom": "Le pied du géant",
+      "localisation": "25 Grande Rue, 07300 Tournon-sur-Rhône — Ardèche",
+      "capacite": 15,
+      "photo": false,
+      "prix": null,
+      "description": "4 chambres avec sdb Propriétaire de ce grand gîte ?",
+      "equipements": []
+    },
+    {
+      "nom": "Auberge de Planzolles",
+      "localisation": "61 impasse de l'Ubac, 07230 Planzolles — Ardèche",
+      "capacite": 15,
+      "photo": false,
+      "prix": null,
+      "description": "6 chambres avec sdb Propriétaire de ce grand gîte ?",
+      "equipements": []
+    },
+    {
+      "nom": "Le Moulin de Charrier",
+      "localisation": "Le Moulin de Charrier, 07600 Labastide-sur-Bésorgues — Ardèc",
+      "capacite": 15,
+      "photo": false,
+      "prix": null,
+      "description": "5 chambres avec sdb Propriétaire de ce grand gîte ?",
+      "equipements": []
+    },
+    {
+      "nom": "Maison des Papés",
+      "localisation": "Rue Alphonse Daudet, 07110 Laurac-en-Vivarais — Ardèche",
+      "capacite": 18,
+      "photo": false,
+      "prix": null,
+      "description": "4 suites et dortoir, piscine, sud Ardèche Propriétaire de ce grand gîte ?",
+      "equipements": [
+        "Piscine"
+      ]
+    },
+    {
+      "nom": "Gîte d’Etape L'Art des Chemins",
+      "localisation": "Le Village, 07160 Belsentes — Ardèche",
+      "capacite": 20,
+      "photo": false,
+      "prix": null,
+      "description": "2 dortoirs de 6 personnes, dortoir de 8 personnes Propriétaire de ce grand gîte ",
+      "equipements": []
+    }
+  ],
+  "stats": {
+    "with_photo": 3,
+    "with_desc": 60,
+    "with_prix": 3,
+    "with_equip": 38,
+    "depts": [
+      "24",
+      "07"
+    ]
+  }
+}

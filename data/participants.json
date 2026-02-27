@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "nom_foyer": "Famille Dupont",
+    "adultes": 2,
+    "enfants": 3,
+    "bebes": 1
+  },
+  {
+    "id": 2,
+    "nom_foyer": "Famille Martin",
+    "adultes": 2,
+    "enfants": 1,
+    "bebes": 0
+  },
+  {
+    "id": 3,
+    "nom_foyer": "Cousin Paul",
+    "adultes": 1,
+    "enfants": 0,
+    "bebes": 0
+  }
+]

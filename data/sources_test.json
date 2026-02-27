@@ -1,0 +1,82 @@
+{
+  "grandsgites": {
+    "count": 100,
+    "time_s": 1.0,
+    "samples": [
+      {
+        "nom": "L'Adret de Cornillac",
+        "photo": true,
+        "loc": "Drôme (26)"
+      },
+      {
+        "nom": "La Rivée",
+        "photo": true,
+        "loc": "Ille et Vilaine (35)"
+      },
+      {
+        "nom": "Gîte des Ours",
+        "photo": true,
+        "loc": "Isère (38)"
+      }
+    ],
+    "status": "OK"
+  },
+  "gitesxxl": {
+    "count": 42,
+    "time_s": 0.4,
+    "samples": [
+      {
+        "nom": "Référencez votre grand gîte",
+        "photo": false,
+        "loc": "France"
+      },
+      {
+        "nom": "En savoir plus",
+        "photo": false,
+        "loc": "France"
+      },
+      {
+        "nom": "Nouvelle-Aquitaine",
+        "photo": false,
+        "loc": "France"
+      }
+    ],
+    "status": "OK"
+  },
+  "gigalocation": {
+    "count": 0,
+    "time_s": 0.4,
+    "samples": [],
+    "status": "EMPTY"
+  },
+  "toploc": {
+    "count": 0,
+    "time_s": 3.9,
+    "samples": [],
+    "status": "EMPTY"
+  },
+  "greengo": {
+    "count": 0,
+    "time_s": 4.0,
+    "samples": [],
+    "status": "EMPTY"
+  },
+  "abritel": {
+    "count": 0,
+    "time_s": 6.1,
+    "samples": [],
+    "status": "EMPTY"
+  },
+  "clevacances": {
+    "count": 0,
+    "time_s": 4.1,
+    "samples": [],
+    "status": "EMPTY"
+  },
+  "gitesdefrance": {
+    "count": 0,
+    "status": "SKIPPED (403)",
+    "time_s": 0,
+    "samples": []
+  }
+}

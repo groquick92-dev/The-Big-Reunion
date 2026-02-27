@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Gites de groupe de 25 à 39 personnes en France</title>
+<meta name="description" content="Gites de groupe, de séjour ou d'étape de 25 à 39 personnes couchages en France - GrandsGites.com" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="style-v5.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+        integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+        crossorigin=""/>
+<link rel="stylesheet" href="MarkerCluster.css" />		
+<link rel="stylesheet" href="MarkerCluster.Default.css" />
+<script defer data-domain="grandsgites.com" src="https://plausible.io/js/plausible.js"></script>
+<script type="text/javascript" src="https://tarteaucitron.io/load.js?domain=www.grandsgites.com&uuid=7c199e0412e9192dc71646d00e6fa79b92102584"></script>
+<script>(tarteaucitron.job = tarteaucitron.job || []).push('googlemapssearch');</script>
+</head>
+<body>
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+        integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+<script type="text/javascript" src="js/leaflet.markercluster.js"></script>
+<div id="conteneur">
+<header>
+<nav>
+<ul>
+	<li class="m_accueil"><a href="https://www.grandsgites.com/" title="Accueil du site">Accueil</a></li>
+	<li class="m_selection"><a href="selection-gites.htm" title="Vote sélection de gites de groupe" rel="nofollow">Ma sélection : 0 gite</a></li>
+	<li class="m_proprio"><a href="espace_pro.htm" title="Le coin des propriétaires" rel="nofollow">Le coin propriétaire</a></li>
+	<li class="m_insc"><a href="inscription.htm" title="Inscrire votre gite de groupe" rel="nofollow">Déposer votre annonce</a></li>
+</ul>
+</nav>
+</header>
+<div id="logo"><a href="https://www.grandsgites.com/" title="Accueil"></a></div>
+<div id="fond_gris_cap">
+<div id="bloc_pres">
+<div id="fond_cap">
+<div id="capacite_sel">
+<div class="rec_cap1"><a href="gite-grande-capacite-A.htm">12 À 15 PERSONNES</a></div><div class="rec_cap2"><a href="gite-grande-capacite-Abis.htm">16 À 24 PERSONNES</a></div><div class="rec_cap_sel"><a href="gite-grande-capacite-B.htm">25 À 39 PERSONNES</a></div><div class="rec_cap4"><a href="gite-grande-capacite-C.htm">40 À 59 PERSONNES</a></div><div class="rec_cap5"><a href="gite-grande-capacite-D.htm">60 À 80 PERSONNES</a></div><div class="rec_cap6"><a href="gite-grande-capacite-E.htm">+ DE 80 PERSONNES</a></div></div>
+</div>
+<div id="bloc_presentation_page">
+<h1><span class="t1">Gites de groupe d'une capacité max de 25 à 39 personnes</span></h1>
+<br />
+</div>
+<div id="recherche_capacite">
+<div id="bloc_recherche_cap">
+<form method="POST">
+<input type="hidden" name="choix_formule" value="">
+<input type="hidden" name="choix_dpt" value="">	
+<select name="choix_reg" aria-label="Région" onChange="form.submit()">
+<option value="">Toutes régions</option>
+<option value="Alsace" >Alsace</option>
+<option value="Aquitaine" >Aquitaine</option>
+<option value="Auvergne" >Auvergne</option>
+<option value="Basse-Normandie" >Basse-Normandie</option>
+<option value="Bourgogne" >Bourgogne</option>
+<option value="Bretagne" >Bretagne</option>
+<option value="Centre" >Centre</option>
+<option value="Champagne-Ardenne" >Champagne-Ardenne</option>
+<option value="Corse" >Corse</option>
+<option value="Franche-Comté" >Franche-Comté</option>
+<option value="Haute-Normandie" >Haute-Normandie</option>
+<option value="Ile de France" >Ile de France</option>
+<option value="Languedoc-Roussillon" >Languedoc-Roussillon</option>
+<option value="Limousin" >Limousin</option>
+<option value="Lorraine" >Lorraine</option>
+<option value="Midi-Pyrénées" >Midi-Pyrénées</option>
+<option value="Nord Pas de Calais" >Nord Pas de Calais</option>
+<option value="Outre-Mer" >Outre-Mer</option>
+<option value="Pays de Loire" >Pays de Loire</option>
+<option value="Picardie" >Picardie</option>
+<option value="Poitou-Charentes" >Poitou-Charentes</option>
+<option value="Provence-Alpes Côte-d Azur" >Provence-Alpes Côte-d Azur</option>
+<option value="Rhône-Alpes" >Rhône-Alpes</option>
+</select>
+</form>
+<form method="POST">
+	<input type="hidden" name="choix_reg" value="">
+	<input type="hidden" name="choix_dpt" value="">	
+	<select name="choix_formule" aria-label="Formule" onChange="form.submit()">
+	<option value="">Toutes les formules</option>
+	<option value="Gestion libre" >Gestion libre</option>
+	<option value="Pt déj." >Nuit + Pt déj.</option>		
+	<option value="Demi-pension" >Demi-pension</option>
+	<option value="Pens. compl." >Pension complète</option>
+	</select>		
+</form>	
+</div>
+</div>
+<div id="plus_nb">Gites d'une capacité maximale de 25 à 39 personnes > <span class="or1">Toutes les régions</span> > 904 g&icirc;tes <br />
+>> Contact direct = 0 % de frais de réservation !</div>
+<div id="t_guide_reg">
+<span class="picto-guide-reg"><a href="guide-visiteurs.htm" title="Guide du locataire d'un gite de groupe">GUIDE DU LOCATAIRE</a></span> <span class="picto-faq-reg"><a href="faq-visiteurs.htm" title="FAQ visiteurs">FAQ</a></span> <span class="picto-classement-reg"><a href="infos-visiteurs.htm" title="Classement des annonces">CLASSEMENT DES ANNONCES</a></span>
+</div>
+</div>
+</div>
+<div id="fond_orange_liste">
+<div id="bloc_orange">
+<div id="bloc_annonce">
+	
+<div class="fichecourte">
+<div class="t_img"><a href="gite-27-le-pensionnat-34.htm" title="Gite pour groupe Eure"><img class="lazy" data-original="https://www.grandsgites.com/images/photos-gites/entete/gite-pensionnat-pt.jpg" alt="Gite de groupe Eure" width="200" height="151" /><noscript><img src="https://www.grandsgites.com/images/photos-gites/entete/gite-pensionnat-pt.jpg" alt="Gite de groupe Eure" /></noscript></a></div>
+<div class="t_donnees"><span class="maj"><a href="gite-27-le-pensionnat-34.htm" title="Gite de groupe Eure">Le Pensionnat</a></span><br />
+		<span class="gris2">27260 Asnières<br />
+		Eure</span><br />
+		<span class="or4">Jusqu'à 38 personnes</span><br />
+		<span class="gris2">Gestion libre</span><br />
+				
+</div>
+		<div class="t_txt_pres"><span class="desc_gite">Notre gîte Le Pensionnat vous accueille dans un lieu chargé d’histoire et de charme. Ancien pensionnat de jeunes filles, il est aujourd’hui transformé en un spacieux gîte de groupe, niché dans un écrin de verdure de 4000 m². Le vaste jardin privatif est idéal pour des moments de détente, des jeux en plein air et des activités conviviales entre amis, en famille ou entre[...]</span> 
+</div>
+	<span class="picto_liste"><span class="c_salle">Salle de réception</span>	<span class="picto_cap3">Max 38 couchages</span></span>
+	<span class="lien_annonce"><a href="gite-27-le-pensionnat-34.htm" title="Gite de groupe Le Pensionnat">Annonce <span class="lien_annonce_nom">Le Pensionnat</span></a><span class="gris"> - Réf. 34</span></span>
+</div>
+	
+<div class="fichecourte">
+<div class="t_img"><a href="gite-45-moulin-mousseau-189.htm" title="Gite pour groupe Loiret"><img class="lazy" data-original="https://www.grandsgites.com/images/photos-gites/entete/gite-mousseau-pt.jpg" alt="Gite de groupe Loiret" width="200" height="151" /><noscript><img src="https://www.grandsgites.com/images/photos-gites/entete/gite-mousseau-pt.jpg" alt="Gite de groupe Loiret" /></noscript></a></div>
+<div class="t_donnees"><span class="maj"><a href="gite-45-moulin-mousseau-189.htm" title="Gite de groupe Loiret">Le Moulin de Mousseau</a></span><br />
+		<span class="gris2">45230 Montbouy<br />
+		Loiret</span><br />
+		<span class="or4">Jusqu'à 28 personnes</span><br />
+		<span class="gris2">Gestion libre</span><br />
+				
+</div>
+		<div class="t_txt_pres"><span class="desc_gite">A 140 km au sud de Paris, le moulin de Mousseau vous propose des hébergements spacieux, confortables et bien équipés. La propriété s’étend sur 5 hectares de prairies et jardins, parcourus de rivières et plans d’eau. C’est un lieu propice à l’organisation de stages de développement personnel et d’activités artistiques. L’accueil est réservé aux groupes d’adultes. Trois[...]</span> 
+</div>
+	<span class="picto_liste">	<span class="picto_cap3">Max 28 couchages</span></span>
+	<span class="lien_annonce"><a href="gite-45-moulin-mousseau-189.htm" title="Gite de groupe Le Moulin de Mousseau">Annonce <span class="lien_annonce_nom">Le Moulin de Mousseau</span></a><span class="gris"> - Réf. 189</span></span>
+</div>
+	
+<div class="fichecourte">
+<div class="t_img"><a href="gite-41-verger-saules-6514.htm" title="Gite pour groupe Loir et Cher"><img class="lazy" data-original="https://www.grandsgites.com/images/photos-gites/entete/gite-verger-saules-pt.jpg" alt="Gite de groupe Loir et Cher" width="200" height="151" /><noscript><img src="https://www.grandsgites.com/images/photos-gites/entete/gite-verger-saules-pt.jpg" alt="Gite de groupe Loir et Cher" /></noscript></a></div>
+<div class="t_donnees"><span class="maj"><a href="gite-41-verger-saules-6514.htm" title="Gite de groupe Loir et Cher">Le Verger Des Saules</a></span><br />
+		<span class="gris2">41700 Cour-Cheverny<br />
+		Loir et Cher</span><br />
+		<span class="or4">Jusqu'à 37 personnes</span><br />
+		<span class="gris2">Gestion libre</span><br />
+				
+</div>
+		<div class="t_txt_pres"><span class="desc_gite">Cette propriété d’exception à 2 min de Cheverny, entièrement close, sur fond de verdure arborée et de bruit de ruisseau, alliant authenticité confort et modernité, accueillera vos réceptions à compter de mars 2024. La salle de réception et de danse en charpente cathédrale de bois et de pierre, avec ciel étoilé lumineux (capacité 120 convives assis), éclairée par deux portes[...]</span> 
+</div>
+	<span class="picto_liste"><span class="c_salle">Salle de réception</span><span class="c_piscine">Piscine</span>	<span class="picto_cap3">Max 37 couchages</span></span>
+	<span class="lien_annonce"><a href="gite-41-verger-saules-6514.htm" title="Gite de groupe Le Verger Des Saules">Annonce <span class="lien_annonce_nom">Le Verger Des Saules</span></a><span class="gris"> - Réf. 6514</span></span>
+</div>
+	
+<div class="fichecourte">
+<div class="t_img"><a href="gite-17-roses-jonzac-4623.htm" title="Gite pour groupe Charente-Maritime"><img class="lazy" data-original="https://www.grandsgites.com/images/photos-gites/entete/gite-roses-jonzac-pt.jpg" alt="Gite de groupe Charente-Maritime" width="200" height="151" /><noscript><img src="https://www.grandsgites.com/images/photos-gites/entete/gite-roses-jonzac-pt.jpg" alt="Gite de groupe Charente-Maritime" /></noscript></a></div>
+<div class="t_donnees"><span class="maj"><a href="gite-17-roses-jonzac-4623.htm" title="Gite de groupe Charente-Maritime">Les Roses de Jonzac</a></span><br />
+		<span class="gris2">17500 Mortiers<br />
+		Charente-Maritime</span><br />
+		<span class="or4">Jusqu'à 26 personnes</span><br />
+		<span class="gris2">Gestion libre</span><br />
+				
+</div>
+		<div class="t_txt_pres"><span class="desc_gite">Bienvenue aux Roses de Jonzac ! Nous sommes un domaine familial d'hébergements touristiques avec une salle de réception et une piscine. Venez chez nous si vous souhaitez profiter d'un séjour insolite, grâce à nos 3 roulottes, et au calme puisque nous sommes à la campagne entourés de vignes et de champs de tournesols. Le grand jardin de 4000 m² permettra aux enfants de profiter de la[...]</span> 
+</div>
+	<span class="picto_liste"><span class="c_salle">Salle de réception</span><span class="c_piscine">Piscine</span>	<span class="picto_cap3">Max 26 couchages</span></span>
+	<span class="lien_annonce"><a href="gite-17-roses-jonzac-4623.htm" title="Gite de groupe Les Roses de Jonzac">Annonce <span class="lien_annonce_nom">Les Roses de Jonzac</span></a><span class="gris"> - Réf. 4623</span></span>
+</div>
+	
+<div class="fichecourte">
+<div class="t_img"><a href="gite-34-mas-du-grand-bosc-464.htm" title="Gite pour groupe Hérault"><img class="lazy" data-original="https://www.grandsgites.com/images/photos-gites/entete/gite-grandbosc-pt.jpg" alt="Gite de groupe Hérault" width="200" height="151" /><noscript><img src="https://www.grandsgites.com/images/photos-gites/entete/gite-grandbosc-pt.jpg" alt="Gite de groupe Hérault" /></noscript></a></div>
+<div class="t_donnees"><span class="maj"><a href="gite-34-mas-du-grand-bosc-464.htm" title="Gite de groupe Hérault">Mas du Grand Bosc</a></span><br />
+		<span class="gris2">34380 Notre Dame de Londres<br />
+		Hérault</span><br />
+		<span class="or4">Jusqu'à 30 personnes</span><br />
+		<span class="gris2">Gestion libre</span><br />
+				
+</div>
+		<div class="t_txt_pres"><span class="desc_gite">Dans un mas restauré entre pierres et poutres, venez découvrir le confort en pleine garrigue face au Pic Saint Loup. Vous pouvez vous reposer ou profiter des activités sur place : tennis, piscines, volley, ping-pong, pétanque, jeux d'enfants... Le Mas du Grand Bosc vous propose d'organiser vos week-ends ou vos anniversaires à 25 mn de Montpellier.</span> 
+</div>
+	<span class="picto_liste"><span class="c_salle">Salle de réception</span><span class="c_piscine">Piscine</span>	<span class="picto_cap3">Max 30 couchages</span></span>
+	<span class="lien_annonce"><a href="gite-34-mas-du-grand-bosc-464.htm" title="Gite de groupe Mas du Grand Bosc">Annonce <span class="lien_annonce_nom">Mas du Grand Bosc</span></a><span class="gris"> - Réf. 464</span></span>
+</div>
+	
+<div class="fichecourte">
+<div class="t_img"><a href="gite-58-cosy-vorroux-7164.htm" title="Gite pour groupe Nièvre"><img class="lazy" data-original="https://www.grandsgites.com/images/photos-gites/entete/gite-cosy-vorroux-pt.jpg" alt="Gite de groupe Nièvre" width="200" height="151" /><noscript><img src="https://www.grandsgites.com/images/photos-gites/entete/gite-cosy-vorroux-pt.jpg" alt="Gite de groupe Nièvre" /></noscript></a></div>
+<div class="t_donnees"><span class="maj"><a href="gite-58-cosy-vorroux-7164.htm" title="Gite de groupe Nièvre">Gite Cosy</a></span><br />
+		<span class="gris2">58330 Crux-La-Ville<br />
+		Nièvre</span><br />
+		<span class="or4">Jusqu'à 25 personnes</span><br />
+		<span class="gris2">Gestion libre</span><br />
+				
+</div>
+		<div class="t_txt_pres"><span class="desc_gite">Située au coeur de la Nièvre au pied du Morvan, cette propriété est un havre de paix pour tous ceux qui recherchent la nature et la quiétude et qui veulent se retrouver en famille et entre amis.</span> 
+</div>
+	<span class="picto_liste">	<span class="picto_cap3">Max 25 couchages</span></span>
+	<span class="lien_annonce"><a href="gite-58-cosy-vorroux-7164.htm" title="Gite de groupe Gite Cosy">Annonce <span class="lien_annonce_nom">Gite Cosy</span></a><span class="gris"> - Réf. 7164</span></span>
+</div>
+	
+<div class="f

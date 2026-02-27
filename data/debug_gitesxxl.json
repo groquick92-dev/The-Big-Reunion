@@ -1,0 +1,27 @@
+[
+  {
+    "capacity": "12",
+    "name": "L'abri",
+    "text": " L'abri Le Village, 07450 Sagnes-et-Goudoulet 2 dortoirs de 6 personnes"
+  },
+  {
+    "capacity": "12",
+    "name": "Côté Cour, Côté Jardin",
+    "text": " Côté Cour, Côté Jardin 319 Vieille Route de Lagorce, 07150 Vallon-Pont-d'Arc 5 chambres, piscine"
+  },
+  {
+    "capacity": "12",
+    "name": "Gîte Philippon",
+    "text": " Gîte Philippon 225 Philipon, 07410 Saint-Félicien 5 chambres"
+  },
+  {
+    "capacity": "14",
+    "name": "Le grand Cool Douce",
+    "text": " Le grand Cool Douce Les Clairières, 07260 Joyeuse 4 chambres, piscine"
+  },
+  {
+    "capacity": "14",
+    "name": "Le Mazet Saint-Michel",
+    "text": " Le Mazet Saint-Michel Le Serre, 07210 Rochessauve 5 chambres, piscine"
+  }
+]

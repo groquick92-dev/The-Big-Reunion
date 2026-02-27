@@ -1,0 +1,45 @@
+﻿Scraping GrandsGites.com (capacite >= 20)...
+python : 
+INFO:scraper:Scraping 
+GrandsGites: 16 Ó 24 
+personnes ù https://www.grands
+gites.com/gite-grande-capacite
+-Abis.htm
+Au caractère Ligne:1 : 1
++ python test_scraper.py 2>&1 
+| Out-File -FilePath 
+data\test_output.txt ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: (INFO:scra  
+  per:Sc...pacite-Abis.htm:   
+ String) [], RemoteExcepti    
+on
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+INFO:scraper:  Found 864 
+cards on page Abis
+INFO:scraper:\u2705 
+GrandsGites.com: 100 real 
+listings scraped
+
+Total: 100 real gites
+
+  [IMG] [   ] Le Chalet du PÛcheur                     | Gestion libre (80)        | Cap: 20 | 
+  [IMG] [   ] La Claie des Landes - Les Clefs du C£ur  | Gestion libre (56)        | Cap: 18 | 
+  [IMG] [   ] Les Gites du CÞdre                       | Gestion libre (07)        | Cap: 22 | Piscine
+  [IMG] [   ] G¯te du Domaine d'HaulmÚ                 | Gestion libre (08)        | Cap: 19 | 
+  [IMG] [   ] Gite communal de Gigny                   | Gestion libre (71)        | Cap: 24 | 
+  [IMG] [   ] Gite Bordarosa                           | Gestion libre (65)        | Cap: 22 | Piscine, Salle de rÚception
+  [IMG] [   ] Gite de l'Enchantement                   | Gestion libre (42)        | Cap: 20 | Salle de rÚception
+  [IMG] [   ] RÚsidence les Bernardins                 | Gestion libre (83)        | Cap: 19 | Piscine
+  [IMG] [   ] La RivÚe                                 | Gestion libre (35)        | Cap: 19 | Salle de rÚception
+  [IMG] [   ] Le Moulinet                              | Gestion libre (09)        | Cap: 21 | Piscine
+  [IMG] [   ] Le To¯ du Monde                          | Pt dÚj. / Gestion libre ( | Cap: 20 | Salle de rÚception
+  [IMG] [   ] G¯te du Mont Beuvray                     | Pt dÚj. / Gestion libre ( | Cap: 19 | 
+  [IMG] [   ] G¯te des artistes                        | Gestion libre (45)        | Cap: 22 | 
+  [IMG] [   ] Gite de l'Hessard                        | Gestion libre (22)        | Cap: 21 | 
+  [IMG] [   ] La Combe d'Abondance - Ferme Comtoise    | Gestion libre (25)        | Cap: 24 | 
+
+Stats: 100 photos, 100 descriptions, 51 with equipment, 3 pet-friendly

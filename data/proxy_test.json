@@ -1,0 +1,33 @@
+{
+  "test1_no_url": {
+    "status": 400
+  },
+  "test2_thumbnail": {
+    "status": 200,
+    "content_type": "image/jpeg",
+    "size_bytes": 6257
+  },
+  "test3_fullsize": {
+    "status": 404,
+    "content_type": "text/html; charset=utf-8",
+    "size_bytes": 0
+  },
+  "test4_direct": {
+    "status": 200,
+    "size_bytes": 6257
+  },
+  "sample_photos": [
+    {
+      "nom": "Ancienne Ecole de Rouffiat",
+      "photo": "https://www.grandsgites.com/images/photos-gites/entete/gite-ecole-rouffiat.jpg"
+    },
+    {
+      "nom": "Gîte de Montrozier",
+      "photo": "https://www.grandsgites.com/images/photos-gites/entete/gite-montrozier.jpg"
+    },
+    {
+      "nom": "Gîte des Castors de Loire",
+      "photo": "https://www.grandsgites.com/images/photos-gites/entete/gite-castors-de-loire.jpg"
+    }
+  ]
+}

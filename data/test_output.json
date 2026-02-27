@@ -1,0 +1,174 @@
+{
+  "total": 100,
+  "samples": [
+    {
+      "nom": "La Romanerie",
+      "localisation": "Côte d Or (21)",
+      "capacite": 16,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-la-romanerie.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Bienvenue dans notre gîte rural dans l'Auxois, sur prés de 1 ha au cœur de la Bourgogne. Annette et "
+    },
+    {
+      "nom": "Domaine Le Trouillet",
+      "localisation": "Ardèche (07)",
+      "capacite": 20,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-le-trouillet.jpg",
+      "animaux": false,
+      "equipements": [
+        "Salle de réception"
+      ],
+      "description": "La maison a été construite dans un esprit écologique, avec matériaux naturels et de qualité. Chaque "
+    },
+    {
+      "nom": "L'Adret de Cornillac",
+      "localisation": "Drôme (26)",
+      "capacite": 18,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-adret-cornillac.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Dans une région splendide et sauvage qui jouit de 300 jours de soleil par an ont été construits auto"
+    },
+    {
+      "nom": "La Chouette Bleue",
+      "localisation": "Aude (11)",
+      "capacite": 24,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-chouette-bleue.jpg",
+      "animaux": false,
+      "equipements": [
+        "Piscine",
+        "Salle de réception"
+      ],
+      "description": "Gîtes La Chouette bleue : Deux Très beaux gîtes à la déco design et soignée de 160 m² chacun 10 à 24"
+    },
+    {
+      "nom": "L'Aventure au Bord de l'Eau",
+      "localisation": "Drôme (26)",
+      "capacite": 21,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-aventure-bord-eau.jp",
+      "animaux": false,
+      "equipements": [],
+      "description": "Bienvenue à \"L'Aventure au Bord de l'Eau\" ! Plongez dans un écrin de verdure niché au cœur d'un vall"
+    },
+    {
+      "nom": "Gite de planchat",
+      "localisation": "Loire (42)",
+      "capacite": 21,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-planchat.jpg",
+      "animaux": true,
+      "equipements": [],
+      "description": "Prêt à vous accueillir, pour un weekend, une semaine entre amis ou en famille. Situé sur le bas de l"
+    },
+    {
+      "nom": "Le Moulin du Pré",
+      "localisation": "Indre et Loire (37)",
+      "capacite": 17,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-moulin-du-pre.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Vous cherchez un endroit chaleureux et convivial pour réunir votre famille ou vos amis pour un week-"
+    },
+    {
+      "nom": "Domaine Saint Henry",
+      "localisation": "Aude (11)",
+      "capacite": 20,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-domaine-st-henry.jpg",
+      "animaux": false,
+      "equipements": [
+        "Piscine"
+      ],
+      "description": "Nous proposons à la location saisonnière un ensemble de 3 maisons pour une capacité de 20 personnes "
+    },
+    {
+      "nom": "Le Monto'Zar",
+      "localisation": "Loire (42)",
+      "capacite": 19,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-montozar.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Au cœur du Parc Naturel Régional du Pilat, venez vous ressourcer au Monto'Zar. Entre neige et soleil"
+    },
+    {
+      "nom": "Chalet Les Jacobines",
+      "localisation": "Savoie (73)",
+      "capacite": 17,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-jacobines.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Bienvenue au Chalet Les Jacobines (La Plagne-Paradiski), situé à 150m du Télésiège de La Roche, reli"
+    },
+    {
+      "nom": "Château La Carrière",
+      "localisation": "Dordogne (24)",
+      "capacite": 16,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-chat-la-carriere.jpg",
+      "animaux": false,
+      "equipements": [
+        "Piscine"
+      ],
+      "description": "Vous recherchez un domaine d'exception pour vous retrouver en famille ou entre amis, ne cherchez pas"
+    },
+    {
+      "nom": "Histoires de Lauze",
+      "localisation": "Haute-Loire (43)",
+      "capacite": 24,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-histoires-lauze.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Ancien corps de ferme de 550 m² et sa superbe pièce à vivre avec une décoration ethnique originale. "
+    },
+    {
+      "nom": "Les Gîtes de Vulcain",
+      "localisation": "Puy de Dôme (63)",
+      "capacite": 23,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-vulcain.jpg",
+      "animaux": false,
+      "equipements": [],
+      "description": "Un ensemble de trois chalets dans le même village, un pour 12 personnes, un pour 6 personnes et un p"
+    },
+    {
+      "nom": "Gite des Places",
+      "localisation": "Creuse (23)",
+      "capacite": 20,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-des-places.jpg",
+      "animaux": false,
+      "equipements": [
+        "Salle de réception"
+      ],
+      "description": "Vous cherchez un lieu unique pour vous retrouver en famille, entre amis ou pour organiser un événeme"
+    },
+    {
+      "nom": "Maison Inès",
+      "localisation": "Eure et loir (28)",
+      "capacite": 18,
+      "photo": true,
+      "photo_url": "https://www.grandsgites.com/images/photos-gites/entete/gite-maison-ines.jpg",
+      "animaux": false,
+      "equipements": [
+        "Piscine"
+      ],
+      "description": "Le concept hellofamily©, ce sont des maisons de campagne cosy, very kids friendly, à moins de 2h de "
+    }
+  ],
+  "stats": {
+    "with_photo": 100,
+    "with_desc": 100,
+    "with_equip": 59,
+    "pet_friendly": 6
+  }
+}

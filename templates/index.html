@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cousinade Planner — Organisez votre réunion de famille</title>
+  <meta name="description"
+    content="Trouvez le gîte parfait et gérez le budget de votre cousinade en famille. Recherche de grands gîtes, gestion des participants et simulation de coûts.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- Favicon (emoji-based) -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
+</head>
+
+<body>
+
+  <!-- Background Decoration -->
+  <div class="bg-decoration">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+
+  <!-- ─── Navbar ──────────────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">🏡</div>
+        <div>
+          <div class="logo-text">Cousinade Planner</div>
+          <div class="logo-sub">Organisez votre réunion de famille</div>
+        </div>
+      </a>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="search">
+          <span class="tab-icon">🔍</span>
+          <span class="tab-label">Gîtes</span>
+          <span class="tab-badge" id="badge-gites" style="display:none">0</span>
+        </button>
+        <button class="tab-btn" data-tab="participants">
+          <span class="tab-icon">👨‍👩‍👧‍👦</span>
+          <span class="tab-label">La Tribu</span>
+          <span class="tab-badge" id="badge-participants" style="display:none">0</span>
+        </button>
+        <button class="tab-btn" data-tab="simulator">
+          <span class="tab-icon">💰</span>
+          <span class="tab-label">Simulateur</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Main Content ────────────────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- ═══ Tab: Search Gîtes ═══════════════════════════════════════════ -->
+    <section id="panel-search" class="tab-panel active">
+      <div class="section-header">
+        <h1 class="section-title">
+          <span class="emoji">🏡</span>
+          Trouver le gîte parfait
+        </h1>
+        <p class="section-subtitle">
+          Explorez les plus beaux gîtes de groupe en France pour votre cousinade. Filtrez par capacité, budget et
+          localisation.
+        </p>
+      </div>
+
+      <!-- Filters -->
+      <div class="glass-card filters-bar">
+        <div class="filter-group">
+          <label class="filter-label" for="filter-capacite">Capacité min.</label>
+          <input type="number" id="filter-capacite" class="filter-input" placeholder="Ex: 20" value="10" min="1">
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="filter-departement">Département</label>
+          <input type="text" id="filter-departement" class="filter-input" placeholder="Ex: 24, 33, 83...">
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="filter-budget">Budget max. (€/sem.)</label>
+          <input type="number" id="filter-budget" class="filter-input" placeholder="Ex: 5000" min="0">
+        </div>
+        <div class="filter-group filter-group-checkbox">
+          <label class="filter-label">Animaux</label>
+          <label class="toggle-switch" for="filter-animaux">
+            <input type="checkbox" id="filter-animaux">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">🐾 Animaux acceptés</span>
+          </label>
+        </div>
+        <button id="btn-search" class="btn-search" onclick="searchGites()">
+          🔍 Rechercher
+        </button>
+      </div>
+
+      <!-- Sources Legend -->
+      <div class="sources-legend">
+        <span class="sources-title">Sources :</span>
+        <span class="source-chip" style="--chip-color: #6366f1">GrandsGites</span>
+        <span class="source-chip" style="--chip-color: #ec4899">GitesXXL</span>
+        <span class="source-chip" style="--chip-color: #10b981">GreenGo</span>
+        <span class="source-chip" style="--chip-color: #f59e0b">TopLoc</span>
+        <span class="source-chip" style="--chip-color: #3b82f6">Giga-Location</span>
+        <span class="source-chip" style="--chip-color: #ef4444">Abritel</span>
+        <span class="source-chip" style="--chip-color: #059669">Gîtes de France</span>
+        <span class="source-chip" style="--chip-color: #8b5cf6">Clévacances</span>
+      </div>
+
+      <!-- Gîtes Grid -->
+      <div id="gites-grid" class="gites-grid">
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-state-icon">⏳</div>
+          <div class="empty-state-title">Chargement des gîtes...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Tab: Participants ═══════════════════════════════════════════ -->
+    <section id="panel-participants" class="tab-panel">
+      <div class="section-header">
+        <h1 class="section-title">
+          <span class="emoji">👨‍👩‍👧‍👦</span>
+          La Tribu
+        </h1>
+        <p class="section-subtitle">
+          Inscrivez chaque foyer de la famille pour calculer le nombre total de participants et les coûts associés.
+        </p>
+      </div>
+
+      <!-- Tribe Summary -->
+      <div id="tribe-summary" class="tribe-summary"></div>
+
+      <!-- Add Participant Form -->
+      <form id="participant-form" class="glass-card participant-form" style="margin-bottom: 2rem;">
+        <div class="form-group">
+          <label class="form-label" for="input-foyer">Nom du foyer</label>
+          <input type="text" id="input-foyer" class="form-input" placeholder="Ex: Famille Dupont" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-adultes">Adultes</label>
+          <input type="number" id="input-adultes" class="form-input" value="1" min="0" max="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-enfants">Enfants</label>
+          <input type="number" id="input-enfants" class="form-input" value="0" min="0" max="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-bebes">Bébés</label>
+          <input type="number" id="input-bebes" class="form-input" value="0" min="0" max="20">
+        </div>
+        <button type="submit" class="btn-add">
+          ➕ Ajouter
+        </button>
+      </form>
+
+      <!-- Participants List -->
+      <div id="participants-list" class="participants-list"></div>
+    </section>
+
+    <!-- ═══ Tab: Cost Simulator ════════════════════════════════════════ -->
+    <section id="panel-simulator" class="tab-panel">
+      <div class="section-header">
+        <h1 class="section-title">
+          <span class="emoji">💰</span>
+          Simulateur de Coûts
+        </h1>
+        <p class="section-subtitle">
+          Calculez le coût par foyer en fonction du gîte choisi et des frais de bouche. Répartition équitable
+          automatique !
+        </p>
+      </div>
+
+      <div class="simulator-layout">
+        <!-- Controls Panel -->
+        <div class="simulator-controls glass-card">
+          <h3
+            style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;">
+            ⚙️ Paramètres
+          </h3>
+
+          <div class="select-gite-control">
+            <label class="control-label" for="sim-gite-select">🏡 Choisir un gîte</label>
+            <select id="sim-gite-select" class="select-gite">
+              <option value="">— Choisir un gîte —</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="sim-prix">💶 Prix du gîte (€/semaine)</label>
+            <input type="number" id="sim-prix" class="control-input" placeholder="Ex: 4500" min="0">
+            <div class="control-hint">Ou saisissez un prix manuellement</div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="sim-frais-adulte">🍽️ Frais bouche/adulte/jour (€)</label>
+            <input type="number" id="sim-frais-adulte" class="control-input" value="15" min="0" step="0.5">
+            <div class="control-hint">Nourriture, boissons, logistique par adulte</div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="sim-frais-enfant">🧃 Frais bouche/enfant/jour (€)</label>
+            <input type="number" id="sim-frais-enfant" class="control-input" value="8" min="0" step="0.5">
+            <div class="control-hint">Nourriture, boissons par enfant</div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="sim-jours">📅 Nombre de jours</label>
+            <input type="number" id="sim-jours" class="control-input" value="7" min="1" max="30">
+          </div>
+
+          <button class="btn-simulate" onclick="runSimulation()">
+            🎯 Calculer la répartition
+          </button>
+        </div>
+
+        <!-- Results Panel -->
+        <div id="simulation-results">
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <div class="empty-state-title">En attente de simulation</div>
+            <div class="empty-state-text">
+              Sélectionnez un gîte et ajustez les paramètres, puis cliquez sur "Calculer la répartition" pour voir
+              combien chaque foyer devra payer.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- JavaScript -->
+  <script src="/static/js/app.js"></script>
+</body>
+
+</html>
