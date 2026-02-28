@@ -17,13 +17,14 @@ from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from bs4 import BeautifulSoup
+from deps_map import GG_DEPARTMENTS, XXL_DEPARTMENTS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 CACHE_FILE = os.path.join(DATA_DIR, "cache_gites.json")
-CACHE_DURATION = 3600  # 1 hour cache
+CACHE_DURATION = 86400  # 24 hours cache
 
 HEADERS = {
     "User-Agent": (
@@ -78,11 +79,17 @@ def detect_animaux(text: str) -> bool:
     return any(kw in text.lower() for kw in keywords)
 
 
-def load_cache() -> Optional[dict]:
+def get_cache_file(departement: Optional[str]) -> str:
+    if departement:
+        return os.path.join(DATA_DIR, f"cache_gites_{departement}.json")
+    return CACHE_FILE
+
+def load_cache(departement: Optional[str] = None) -> Optional[dict]:
     """Load cached results if fresh enough."""
+    cfile = get_cache_file(departement)
     try:
-        if os.path.exists(CACHE_FILE):
-            with open(CACHE_FILE, "r", encoding="utf-8") as f:
+        if os.path.exists(cfile):
+            with open(cfile, "r", encoding="utf-8") as f:
                 cache = json.load(f)
             if time.time() - cache.get("timestamp", 0) < CACHE_DURATION:
                 logger.info(f"Using cache ({len(cache['gites'])} gîtes, {int(time.time() - cache['timestamp'])}s old)")
@@ -92,11 +99,12 @@ def load_cache() -> Optional[dict]:
     return None
 
 
-def save_cache(gites: list[dict]) -> None:
+def save_cache(gites: list[dict], departement: Optional[str] = None) -> None:
     """Save results to cache."""
+    cfile = get_cache_file(departement)
     try:
         os.makedirs(DATA_DIR, exist_ok=True)
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        with open(cfile, "w", encoding="utf-8") as f:
             json.dump({"timestamp": time.time(), "gites": gites}, f, ensure_ascii=False, indent=2)
         logger.info(f"Cached {len(gites)} gîtes")
     except Exception as e:
@@ -104,7 +112,7 @@ def save_cache(gites: list[dict]) -> None:
 
 
 # ─── SCRAPER 1: GrandsGites.com (HTML statique — requests + BS4) ─────────
-def scrape_grandsgites(capacite_min: int = 10) -> list[dict]:
+def scrape_grandsgites(capacite_min: int = 10, departement: Optional[str] = None) -> list[dict]:
     """
     Scrape GrandsGites.com — the #1 source for group gîtes in France.
     This site serves static HTML — no JavaScript needed.
@@ -121,7 +129,9 @@ def scrape_grandsgites(capacite_min: int = 10) -> list[dict]:
     MAX_PER_RUN = 100  # Limit to keep response time reasonable
     
     # Only scrape capacity ranges that match the filter
-    if capacite_min > 80:
+    if departement and departement in GG_DEPARTMENTS:
+        pages = [("DEPT", GG_DEPARTMENTS[departement])]
+    elif capacite_min > 80:
         pages = [("E", "80+")]
     elif capacite_min > 59:
         pages = [("D", "60 à 80"), ("E", "80+")]
@@ -138,8 +148,12 @@ def scrape_grandsgites(capacite_min: int = 10) -> list[dict]:
         if len(gites) >= MAX_PER_RUN:
             break
         try:
-            url = f"https://www.grandsgites.com/gite-grande-capacite-{suffix}.htm"
-            logger.info(f"Scraping GrandsGites: {label} personnes — {url}")
+            if suffix == "DEPT":
+                url = f"https://www.grandsgites.com/{label}.htm"
+                logger.info(f"Scraping GrandsGites: Département {departement} — {url}")
+            else:
+                url = f"https://www.grandsgites.com/gite-grande-capacite-{suffix}.htm"
+                logger.info(f"Scraping GrandsGites: {label} personnes — {url}")
             
             response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
@@ -517,7 +531,7 @@ def _save_gdf_incremental(gites: list[dict]):
         logger.warning(f"  Save error: {e}")
 
 
-def scrape_gitesdefrance_stealth(capacite_min: int = 10) -> list[dict]:
+def scrape_gitesdefrance_stealth(capacite_min: int = 10, departement: Optional[str] = None) -> list[dict]:
     """
     Stealth scraper for Gîtes de France — departmental bypass strategy.
     
@@ -536,7 +550,11 @@ def scrape_gitesdefrance_stealth(capacite_min: int = 10) -> list[dict]:
     MAX_PER_RUN = 80
     session = requests.Session()
     
-    for dept_slug, dept_name, dept_num, page_path in GDF_DEPARTMENTS:
+    target_depts = [d for d in GDF_DEPARTMENTS if d[2] == departement] if departement else GDF_DEPARTMENTS
+    if not target_depts:
+        return []
+
+    for dept_slug, dept_name, dept_num, page_path in target_depts:
         if len(gites) >= MAX_PER_RUN:
             break
         
@@ -978,7 +996,7 @@ def scrape_gigalocation(capacite_min: int = 10) -> list[dict]:
 
 
 # ─── SCRAPER 8: GitesXXL.fr (requests — department pages) ────────────────
-def scrape_gitesxxl(capacite_min: int = 10) -> list[dict]:
+def scrape_gitesxxl(capacite_min: int = 10, departement: Optional[str] = None) -> list[dict]:
     """
     Scrape GitesXXL.fr department pages for real gîte listings.
     Real HTML structure: .card elements with h3 (capacity), h4 (name), address text.
@@ -987,17 +1005,22 @@ def scrape_gitesxxl(capacite_min: int = 10) -> list[dict]:
     gites = []
     MAX_PER_RUN = 60
     
-    # Scrape several popular departments (each has ~15-30 listings)
-    departments = [
-        ("ardeche-07", "Ardèche", "07"),
-        ("Dordogne-24", "Dordogne", "24"),
-        ("Morbihan-56", "Morbihan", "56"),
-        ("Calvados-14", "Calvados", "14"),
-        ("Herault-34", "Hérault", "34"),
-        ("Lozere-48", "Lozère", "48"),
-        ("Cotes-d-Armor-22", "Côtes-d'Armor", "22"),
-        ("Vendee-85", "Vendée", "85"),
-    ]
+    if departement and departement in XXL_DEPARTMENTS:
+        departments = [(XXL_DEPARTMENTS[departement], XXL_DEPARTMENTS[departement].split("-")[0], departement)]
+    elif departement:
+        return []
+    else:
+        # Scrape several popular departments
+        departments = [
+            ("ardeche-07", "Ardèche", "07"),
+            ("Dordogne-24", "Dordogne", "24"),
+            ("Morbihan-56", "Morbihan", "56"),
+            ("Calvados-14", "Calvados", "14"),
+            ("Herault-34", "Hérault", "34"),
+            ("Lozere-48", "Lozère", "48"),
+            ("Cotes-d-Armor-22", "Côtes-d'Armor", "22"),
+            ("Vendee-85", "Vendée", "85"),
+        ]
     
     for dept_slug, dept_name, dept_num in departments:
         if len(gites) >= MAX_PER_RUN:
@@ -1181,7 +1204,7 @@ def search_gites(
         Filtered list of real gîtes.
     """
     # Check cache first
-    cached = load_cache()
+    cached = load_cache(departement)
     if cached:
         gites = cached
     else:
@@ -1190,7 +1213,7 @@ def search_gites(
         
         # 1. GrandsGites (requests — fast, reliable)
         try:
-            result = scrape_grandsgites(capacite_min)
+            result = scrape_grandsgites(capacite_min, departement=departement)
             gites.extend(result)
             source_status["grandsgites"] = f"✅ {len(result)}"
         except Exception as e:
@@ -1198,7 +1221,7 @@ def search_gites(
         
         # 2. GitesXXL (requests — fast, department pages)
         try:
-            result = scrape_gitesxxl(capacite_min)
+            result = scrape_gitesxxl(capacite_min, departement=departement)
             gites.extend(result)
             source_status["gitesxxl"] = f"✅ {len(result)}"
         except Exception as e:
@@ -1206,7 +1229,7 @@ def search_gites(
         
         # 3. Gîtes de France — STEALTH (departmental bypass)
         try:
-            result = scrape_gitesdefrance_stealth(capacite_min)
+            result = scrape_gitesdefrance_stealth(capacite_min, departement=departement)
             gites.extend(result)
             source_status["gitesdefrance"] = f"✅ {len(result)}"
         except Exception as e:
@@ -1229,7 +1252,7 @@ def search_gites(
         
         # Cache results
         if gites:
-            save_cache(gites)
+            save_cache(gites, departement=departement)
     
     # Apply filters
     filtered = []

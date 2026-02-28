@@ -309,7 +309,7 @@ function renderParticipants() {
             </div>
           </div>
         </div>
-        <button class="btn-delete" onclick="deleteParticipant(${p.id}, '${p.nom_foyer.replace(/'/g, "\\'")}')">🗑</button>
+        <button class="btn-delete" onclick='deleteParticipant(${p.id}, ${JSON.stringify(p.nom_foyer).replace(/'/g, "&#39;")})'>🗑</button>
       </div>
     `;
   }).join('');
