@@ -9,12 +9,8 @@ const API_BASE = '';
 const SOURCE_INFO = {
   grandsgites: { name: 'GrandsGites', color: '#6366f1' },
   gitesxxl: { name: 'GitesXXL', color: '#ec4899' },
-  greengo: { name: 'GreenGo', color: '#10b981' },
-  toploc: { name: 'TopLoc', color: '#f59e0b' },
   gigalocation: { name: 'Giga-Location', color: '#3b82f6' },
-  abritel: { name: 'Abritel', color: '#ef4444' },
   gitesdefrance: { name: 'Gîtes de France', color: '#059669' },
-  clevacances: { name: 'Clévacances', color: '#8b5cf6' },
 };
 
 // ─── State ──────────────────────────────────────────────────────────────────
@@ -24,7 +20,28 @@ let state = {
   totals: { total_adultes: 0, total_enfants: 0, total_bebes: 0, total_personnes: 0, nb_foyers: 0 },
   currentTab: 'search',
   simulation: null,
+  selectedRegions: new Set()
 };
+
+// ─── Map Data & Config ──────────────────────────────────────────────────────
+const REGIONS_DEPTS = {
+  "Auvergne-Rhône-Alpes": ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"],
+  "Bourgogne-Franche-Comté": ["21", "25", "39", "58", "70", "71", "89", "90"],
+  "Bretagne": ["22", "29", "35", "56"],
+  "Centre-Val de Loire": ["18", "28", "36", "37", "41", "45"],
+  "Corse": ["2A", "2B"],
+  "Grand Est": ["08", "10", "51", "52", "54", "55", "57", "67", "68", "88"],
+  "Hauts-de-France": ["02", "59", "60", "62", "80"],
+  "Île-de-France": ["75", "77", "78", "91", "92", "93", "94", "95"],
+  "Normandie": ["14", "27", "50", "61", "76"],
+  "Nouvelle-Aquitaine": ["16", "17", "19", "23", "24", "33", "40", "47", "64", "79", "86", "87"],
+  "Occitanie": ["09", "11", "12", "30", "31", "32", "34", "46", "48", "65", "66", "81", "82"],
+  "Pays de la Loire": ["44", "49", "53", "72", "85"],
+  "Provence-Alpes-Côte d'Azur": ["04", "05", "06", "13", "83", "84"]
+};
+
+let franceMap = null;
+let geoJsonLayer = null;
 
 // ─── Initialization ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGites();
   setupParticipantForm();
   setupSimulator();
+  initMap();
 });
 
 // ─── Tab Navigation ─────────────────────────────────────────────────────────
@@ -107,6 +125,163 @@ async function apiDelete(endpoint) {
 function toggleSource(btn) {
   btn.classList.toggle('inactive');
   btn.classList.toggle('active');
+}
+
+// ─── Map Logic ──────────────────────────────────────────────────────────────
+async function initMap() {
+  const mapContainer = document.getElementById('france-map');
+  if (!mapContainer || typeof L === 'undefined') return;
+
+  franceMap = L.map('france-map', {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false
+  }).setView([46.603354, 1.888334], 5.4);
+
+  // Add a beautiful dark theme tile layer
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(franceMap);
+
+  // Fetch GeoJSON of French Regions from local static file to avoid CORS/loading issues
+  try {
+    const res = await fetch('/static/regions.geojson');
+    const geoData = await res.json();
+
+    geoJsonLayer = L.geoJSON(geoData, {
+      style: feature => {
+        const isSelected = state.selectedRegions.has(feature.properties.nom);
+        return {
+          fillColor: isSelected ? '#6366f1' : '#1e293b',
+          weight: isSelected ? 2 : 1.5,
+          opacity: 1,
+          color: isSelected ? '#818cf8' : '#334155',
+          fillOpacity: isSelected ? 0.6 : 0.4,
+          className: 'region-polygon'
+        };
+      },
+      onEachFeature: (feature, layer) => {
+        // Add a tooltip for hovering
+        layer.bindTooltip(feature.properties.nom, { sticky: true, className: 'region-tooltip' });
+
+        layer.on({
+          mouseover: e => {
+            const l = e.target;
+            const isSelected = state.selectedRegions.has(feature.properties.nom);
+            l.setStyle({
+              fillColor: isSelected ? '#6366f1' : '#4f46e5',
+              fillOpacity: isSelected ? 0.8 : 0.5,
+              weight: 2,
+              color: '#818cf8'
+            });
+            l.bringToFront();
+          },
+          mouseout: e => {
+            geoJsonLayer.resetStyle(e.target);
+          },
+          click: e => toggleRegion(feature.properties.nom, e.target)
+        });
+      }
+    }).addTo(franceMap);
+  } catch (err) {
+    console.error('Erreur chargement carte:', err);
+  }
+}
+
+function toggleMap() {
+  const wrapper = document.getElementById('map-wrapper');
+  if (wrapper.style.display === 'none') {
+    wrapper.style.display = 'block';
+    document.getElementById('toggle-map-btn').innerHTML = '🗺️ Masquer la carte';
+
+    // Fix leaflet size rendering issue after container un-hide
+    if (franceMap) {
+      setTimeout(() => {
+        franceMap.invalidateSize();
+      }, 100);
+
+      // Secondary check for slow CSS transitions
+      setTimeout(() => {
+        franceMap.invalidateSize();
+      }, 400);
+    }
+  } else {
+    wrapper.style.display = 'none';
+    document.getElementById('toggle-map-btn').innerHTML = '🗺️ Afficher la carte';
+  }
+}
+
+function toggleRegion(regionName, layer) {
+  if (state.selectedRegions.has(regionName)) {
+    state.selectedRegions.delete(regionName);
+    if (layer && geoJsonLayer) geoJsonLayer.resetStyle(layer);
+  } else {
+    state.selectedRegions.add(regionName);
+    if (layer) {
+      layer.setStyle({
+        fillColor: '#6366f1',
+        weight: 2,
+        color: '#ffffff',
+        dashArray: '',
+        fillOpacity: 0.8
+      });
+      layer.bringToFront();
+    }
+  }
+
+  updateDepartementsInput();
+  renderSelectedRegionsChips();
+}
+
+function removeRegion(regionName) {
+  state.selectedRegions.delete(regionName);
+
+  // Reset style on map
+  if (geoJsonLayer) {
+    geoJsonLayer.eachLayer(layer => {
+      if (layer.feature.properties.nom === regionName) {
+        geoJsonLayer.resetStyle(layer);
+      }
+    });
+  }
+
+  updateDepartementsInput();
+  renderSelectedRegionsChips();
+}
+
+function renderSelectedRegionsChips() {
+  const container = document.getElementById('selected-regions-chips');
+  if (!container) return;
+
+  container.innerHTML = Array.from(state.selectedRegions).map(region => `
+    <div class="source-chip" style="background: var(--primary); font-size: 0.8rem; display: flex; align-items: center; gap: 6px; padding: 6px 14px;">
+      ${region}
+      <span style="cursor: pointer; font-weight: bold; background: rgba(0,0,0,0.2); border-radius: 50%; padding: 0 4px;" onclick="removeRegion('${region}')">&times;</span>
+    </div>
+  `).join('');
+}
+
+function updateDepartementsInput() {
+  let allDepts = [];
+  state.selectedRegions.forEach(region => {
+    if (REGIONS_DEPTS[region]) {
+      allDepts = allDepts.concat(REGIONS_DEPTS[region]);
+    }
+  });
+
+  const input = document.getElementById('filter-departement');
+  if (input) {
+    if (allDepts.length > 0) {
+      input.value = allDepts.join(', ');
+    } else {
+      input.value = '';
+    }
+  }
 }
 
 async function loadGites() {
@@ -580,3 +755,5 @@ window.toggleSource = toggleSource;
 window.deleteParticipant = deleteParticipant;
 window.selectGiteForSimulation = selectGiteForSimulation;
 window.runSimulation = runSimulation;
+window.toggleMap = toggleMap;
+window.removeRegion = removeRegion;

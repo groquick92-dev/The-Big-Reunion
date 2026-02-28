@@ -14,6 +14,10 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="/static/css/style.css">
 
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <!-- Favicon (emoji-based) -->
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏡</text></svg>">
@@ -75,68 +79,85 @@
       </div>
 
       <!-- Filters -->
-      <div class="glass-card filters-bar">
-        <div class="filter-group">
-          <label class="filter-label" for="filter-capacite">Capacité min.</label>
-          <input type="number" id="filter-capacite" class="filter-input" placeholder="Ex: 20" value="10" min="1">
-        </div>
-        <div class="filter-group">
-          <label class="filter-label" for="filter-departement">Département</label>
-          <input type="text" id="filter-departement" class="filter-input" placeholder="Ex: 24, 33, 83...">
-        </div>
-        <div class="filter-group">
-          <label class="filter-label" for="filter-budget">Budget max. (€/sem.)</label>
-          <input type="number" id="filter-budget" class="filter-input" placeholder="Ex: 5000" min="0">
-        </div>
-        <div class="filter-group filter-group-checkbox">
-          <label class="filter-label">Animaux</label>
-          <label class="toggle-switch" for="filter-animaux">
-            <input type="checkbox" id="filter-animaux">
-            <span class="toggle-slider"></span>
-            <span class="toggle-label">🐾 Animaux acceptés</span>
-          </label>
-        </div>
-        <div class="flex gap-4 w-full md:w-auto">
-          <button id="btn-deep-scan" class="btn-search"
-            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); flex: 1;" onclick="triggerDeepScan()">
-            🕰️ Scan approfondi
-          </button>
-          <button id="btn-search" class="btn-search" style="flex: 2;" onclick="searchGites()">
-            🔍 Recherche Rapide
-          </button>
+      <div class="glass-card search-dashboard">
+        <div class="filters-grid">
+          <!-- Main Inputs -->
+          <div class="filter-main-inputs">
+            <div class="filter-group focus-group">
+              <div class="filter-label-row">
+                <label class="filter-label">📍 Localisation (Régions/Dép.)</label>
+                <button id="toggle-map-btn" class="btn-micro" onclick="toggleMap()">
+                  🗺️ Afficher la carte
+                </button>
+              </div>
+              <input type="text" id="filter-departement" class="filter-input input-glow"
+                placeholder="Ex: 24, 33, 83... (ou cliquez sur la carte)">
+
+              <div id="selected-regions-chips" class="mt-2 flex flex-wrap gap-2"></div>
+
+              <!-- Carte interactive -->
+              <div id="map-wrapper"
+                style="display: none; margin-top: 1rem; height: 400px; width: 100%; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; z-index: 10;">
+                <div id="france-map" style="height: 100%; width: 100%; background-color: var(--bg-dark);"></div>
+              </div>
+            </div>
+
+            <div class="filter-group-row">
+              <div class="filter-group">
+                <label class="filter-label" for="filter-capacite">👥 Capacité min.</label>
+                <input type="number" id="filter-capacite" class="filter-input input-glow" placeholder="Ex: 20"
+                  value="10" min="1">
+              </div>
+              <div class="filter-group">
+                <label class="filter-label" for="filter-budget">💶 Budget max. (€/sem)</label>
+                <input type="number" id="filter-budget" class="filter-input input-glow" placeholder="Ex: 5000" min="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions & Options -->
+          <div class="filter-sidebar">
+            <div class="filter-group filter-group-checkbox" style="margin-bottom: 1.5rem;">
+              <label class="filter-label">Préférences</label>
+              <label class="toggle-switch" for="filter-animaux" style="margin-top: 0.5rem;">
+                <input type="checkbox" id="filter-animaux">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label text-sm">🐾 Animaux acceptés</span>
+              </label>
+            </div>
+            <div class="search-actions">
+              <button id="btn-search" class="btn-search btn-primary" onclick="searchGites()">
+                🔍 Lancer la recherche
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Sources Legend -->
-      <div class="sources-legend" id="sources-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span class="sources-title">Rechercher sur :</span>
-          <button onclick="clearCache()" class="btn-gite btn-gite-outline"
-            style="padding: 4px 8px; font-size: 0.75rem;">🗑️ Vider le cache</button>
+      <div class="sources-legend glass-card-sm" id="sources-container">
+        <div class="sources-header">
+          <span class="sources-title">📡 Sources de données (Scraping actif) :</span>
+          <button onclick="clearCache()" class="btn-micro btn-danger-outline">🗑️ Vider le cache</button>
         </div>
-        <button class="source-chip active" style="--chip-color: #6366f1" data-source="grandsgites"
-          onclick="toggleSource(this)">GrandsGites</button>
-        <button class="source-chip active" style="--chip-color: #ec4899" data-source="gitesxxl"
-          onclick="toggleSource(this)">GitesXXL</button>
-        <button class="source-chip active" style="--chip-color: #10b981" data-source="greengo"
-          onclick="toggleSource(this)">GreenGo</button>
-        <button class="source-chip active" style="--chip-color: #f59e0b" data-source="toploc"
-          onclick="toggleSource(this)">TopLoc</button>
-        <button class="source-chip active" style="--chip-color: #3b82f6" data-source="gigalocation"
-          onclick="toggleSource(this)">Giga-Location</button>
-        <button class="source-chip active" style="--chip-color: #ef4444" data-source="abritel"
-          onclick="toggleSource(this)">Abritel</button>
-        <button class="source-chip active" style="--chip-color: #059669" data-source="gitesdefrance"
-          onclick="toggleSource(this)">Gîtes de France</button>
-        <button class="source-chip active" style="--chip-color: #8b5cf6" data-source="clevacances"
-          onclick="toggleSource(this)">Clévacances</button>
+        <div class="source-chips-wrapper">
+          <button class="source-chip active" style="--chip-color: #6366f1" data-source="grandsgites"
+            onclick="toggleSource(this)">GrandsGites</button>
+          <button class="source-chip active" style="--chip-color: #ec4899" data-source="gitesxxl"
+            onclick="toggleSource(this)">GitesXXL</button>
+          <button class="source-chip active" style="--chip-color: #3b82f6" data-source="gigalocation"
+            onclick="toggleSource(this)">Giga-Location</button>
+          <button class="source-chip active" style="--chip-color: #059669" data-source="gitesdefrance"
+            onclick="toggleSource(this)">Gîtes de France</button>
+        </div>
       </div>
 
       <!-- Gîtes Grid -->
       <div id="gites-grid" class="gites-grid">
         <div class="empty-state" style="grid-column: 1 / -1;">
-          <div class="empty-state-icon">⏳</div>
-          <div class="empty-state-title">Chargement des gîtes...</div>
+          <div class="loader-spinner"></div>
+          <div class="empty-state-title mt-4">Chargement des gîtes...</div>
+          <div class="empty-state-text">Nous cherchons les meilleures options disponibles en temps réel.</div>
         </div>
       </div>
     </section>
@@ -160,19 +181,19 @@
       <form id="participant-form" class="glass-card participant-form" style="margin-bottom: 2rem;">
         <div class="form-group">
           <label class="form-label" for="input-foyer">Nom du foyer</label>
-          <input type="text" id="input-foyer" class="form-input" placeholder="Ex: Famille Dupont" required>
+          <input type="text" id="input-foyer" class="form-input input-glow" placeholder="Ex: Famille Dupont" required>
         </div>
         <div class="form-group">
           <label class="form-label" for="input-adultes">Adultes</label>
-          <input type="number" id="input-adultes" class="form-input" value="1" min="0" max="20">
+          <input type="number" id="input-adultes" class="form-input input-glow" value="1" min="0" max="20">
         </div>
         <div class="form-group">
           <label class="form-label" for="input-enfants">Enfants</label>
-          <input type="number" id="input-enfants" class="form-input" value="0" min="0" max="20">
+          <input type="number" id="input-enfants" class="form-input input-glow" value="0" min="0" max="20">
         </div>
         <div class="form-group">
           <label class="form-label" for="input-bebes">Bébés</label>
-          <input type="number" id="input-bebes" class="form-input" value="0" min="0" max="20">
+          <input type="number" id="input-bebes" class="form-input input-glow" value="0" min="0" max="20">
         </div>
         <button type="submit" class="btn-add">
           ➕ Ajouter
@@ -206,32 +227,32 @@
 
           <div class="select-gite-control">
             <label class="control-label" for="sim-gite-select">🏡 Choisir un gîte</label>
-            <select id="sim-gite-select" class="select-gite">
+            <select id="sim-gite-select" class="select-gite input-glow">
               <option value="">— Choisir un gîte —</option>
             </select>
           </div>
 
           <div class="control-group">
-            <label class="control-label" for="sim-prix">💶 Prix du gîte (€/semaine)</label>
-            <input type="number" id="sim-prix" class="control-input" placeholder="Ex: 4500" min="0">
+            <label class="control-label" for="sim-prix">💶 Prix du gîte (€/sem)</label>
+            <input type="number" id="sim-prix" class="control-input input-glow" placeholder="Ex: 4500" min="0">
             <div class="control-hint">Ou saisissez un prix manuellement</div>
           </div>
 
           <div class="control-group">
             <label class="control-label" for="sim-frais-adulte">🍽️ Frais bouche/adulte/jour (€)</label>
-            <input type="number" id="sim-frais-adulte" class="control-input" value="15" min="0" step="0.5">
-            <div class="control-hint">Nourriture, boissons, logistique par adulte</div>
+            <input type="number" id="sim-frais-adulte" class="control-input input-glow" value="15" min="0" step="0.5">
+            <div class="control-hint">Nourriture, boissons, logistique</div>
           </div>
 
           <div class="control-group">
             <label class="control-label" for="sim-frais-enfant">🧃 Frais bouche/enfant/jour (€)</label>
-            <input type="number" id="sim-frais-enfant" class="control-input" value="8" min="0" step="0.5">
+            <input type="number" id="sim-frais-enfant" class="control-input input-glow" value="8" min="0" step="0.5">
             <div class="control-hint">Nourriture, boissons par enfant</div>
           </div>
 
           <div class="control-group">
             <label class="control-label" for="sim-jours">📅 Nombre de jours</label>
-            <input type="number" id="sim-jours" class="control-input" value="7" min="1" max="30">
+            <input type="number" id="sim-jours" class="control-input input-glow" value="7" min="1" max="30">
           </div>
 
           <button class="btn-simulate" onclick="runSimulation()">

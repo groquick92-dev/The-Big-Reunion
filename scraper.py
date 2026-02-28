@@ -42,12 +42,8 @@ REQUEST_TIMEOUT = 20
 SOURCES = {
     "grandsgites": {"name": "GrandsGites.com", "color": "#6366f1"},
     "gitesxxl": {"name": "GitesXXL.fr", "color": "#ec4899"},
-    "greengo": {"name": "GreenGo", "color": "#10b981"},
-    "toploc": {"name": "TopLoc", "color": "#f59e0b"},
     "gigalocation": {"name": "Giga-Location", "color": "#3b82f6"},
-    "abritel": {"name": "Abritel", "color": "#ef4444"},
     "gitesdefrance": {"name": "Gîtes de France", "color": "#059669"},
-    "clevacances": {"name": "Clévacances", "color": "#8b5cf6"},
 }
 
 
@@ -1258,104 +1254,98 @@ def run_deep_scan(capacite_min: int = 10, sources: Optional[list[str]] = None):
 
 def search_gites(
     capacite_min: int = 10,
-    departement: Optional[str] = None,
+    departements: Optional[list[str]] = None,
     budget_max: Optional[int] = None,
     animaux: Optional[bool] = None,
-    use_demo: bool = False,  # Kept for API compat, but ignored
     sources: Optional[list[str]] = None,
 ) -> list[dict]:
     """
     Main search function. Scrapes REAL listings from all sources.
     Results are cached for 1 hour to avoid hammering servers.
-
-    Args:
-        capacite_min: Minimum capacity filter.
-        departement: Department number filter.
-        budget_max: Maximum weekly budget filter.
-        animaux: If True, only return pet-friendly gîtes.
-        use_demo: IGNORED — always scrapes live.
-
-    Returns:
-        Filtered list of real gîtes.
     """
-    # Check cache first
-    cached = load_cache(departement)
-    if cached:
-        gites = cached
-    else:
-        gites = []
+    all_gites = []
+    depts_to_scrape = departements if departements else [None]
+    
+    for dept in depts_to_scrape:
+        cached = load_cache(dept)
+        if cached:
+            all_gites.extend(cached)
+            continue
+            
+        dept_gites = []
         source_status = {}
         
-        # 1. GrandsGites (requests — fast, reliable)
+        # 1. GrandsGites (requests)
         if not sources or "grandsgites" in sources:
             try:
-                result = scrape_grandsgites(capacite_min, departement=departement)
-                gites.extend(result)
+                result = scrape_grandsgites(capacite_min, departement=dept)
+                dept_gites.extend(result)
                 source_status["grandsgites"] = f"✅ {len(result)}"
             except Exception as e:
                 source_status["grandsgites"] = f"❌ {e}"
         
-        # 2. GitesXXL (requests — fast, department pages)
+        # 2. GitesXXL (requests)
         if not sources or "gitesxxl" in sources:
             try:
-                result = scrape_gitesxxl(capacite_min, departement=departement)
-                gites.extend(result)
+                result = scrape_gitesxxl(capacite_min, departement=dept)
+                dept_gites.extend(result)
                 source_status["gitesxxl"] = f"✅ {len(result)}"
             except Exception as e:
                 source_status["gitesxxl"] = f"❌ {e}"
         
-        # 3. Gîtes de France — STEALTH (departmental bypass)
+        # 3. Gîtes de France
         if not sources or "gitesdefrance" in sources:
             try:
-                result = scrape_gitesdefrance_stealth(capacite_min, departement=departement)
-                gites.extend(result)
+                result = scrape_gitesdefrance_stealth(capacite_min, departement=dept)
+                dept_gites.extend(result)
                 source_status["gitesdefrance"] = f"✅ {len(result)}"
             except Exception as e:
                 source_status["gitesdefrance"] = f"❌ {e}"
         
-        # 4. Giga-Location (requests)
+        # 4. Giga-Location
         if not sources or "gigalocation" in sources:
             try:
                 result = scrape_gigalocation(capacite_min)
-                gites.extend(result)
+                dept_gites.extend(result)
                 source_status["gigalocation"] = f"✅ {len(result)}"
             except Exception as e:
                 source_status["gigalocation"] = f"❌ {e}"
-        
-        # 5. Load deep scan results if they exist (from background jobs)
+                
+        # 5. Load deep scan results if they exist
         deep_file = os.path.join(DATA_DIR, "deep_gites.json")
         if os.path.exists(deep_file):
             try:
                 with open(deep_file, "r", encoding="utf-8") as f:
                     deep_results = json.load(f)
-                gites.extend(deep_results)
+                dept_gites.extend(deep_results)
                 source_status["deep_scan"] = f"✅ {len(deep_results)} loaded"
             except Exception as e:
                 source_status["deep_scan"] = f"❌ {e}"
+                
+        # Cache results for this dept
+        if dept_gites and not sources:
+            save_cache(dept_gites, departement=dept)
+            
+        all_gites.extend(dept_gites)
         
-        # Assign unique IDs
-        for idx, g in enumerate(gites, start=1):
-            g["id"] = idx
-        
-        # Log summary
-        logger.info("=" * 60)
-        logger.info(f"SCRAPING COMPLETE: {len(gites)} total gîtes from {len(source_status)} sources")
-        for src, status in source_status.items():
-            logger.info(f"  {src}: {status}")
-        logger.info("=" * 60)
-        
-        # Cache results (only if we did a full scan, so we don't overwrite with partial results)
-        if gites and not sources:
-            save_cache(gites, departement=departement)
+    # Assign unique IDs
+    for idx, g in enumerate(all_gites, start=1):
+        g["id"] = idx
     
     # Apply filters
     filtered = []
-    for g in gites:
+    seen_urls = set()
+    for g in all_gites:
+        # Deduplicate by url
+        if g.get("url") in seen_urls:
+            continue
+        seen_urls.add(g.get("url"))
+        
         if sources and g.get("source") and g["source"] not in sources:
             continue
         if g.get("capacite", 0) < capacite_min:
             continue
-        if departement and g.get("departement") and g["departement"] != departement:
+        if departements and g.get("departement") and g["departement"] not in departements:
             continue
         if budget_max and g.get("prix_semaine") and g["prix_semaine"] > budget_max:
             continue

@@ -132,7 +132,8 @@ def api_search_gites():
     """
     try:
         capacite_min = int(request.args.get("capacite_min", 10))
-        departement = request.args.get("departement", "").strip() or None
+        departement_str = request.args.get("departement", "").strip() or None
+        departements = [d.strip() for d in departement_str.split(",")] if departement_str else None
         budget_max_str = request.args.get("budget_max", "").strip()
         budget_max = int(budget_max_str) if budget_max_str else None
         animaux_str = request.args.get("animaux", "").strip().lower()
@@ -143,7 +144,7 @@ def api_search_gites():
 
         gites = search_gites(
             capacite_min=capacite_min,
-            departement=departement,
+            departements=departements,
             budget_max=budget_max,
             animaux=animaux,
             sources=sources,
