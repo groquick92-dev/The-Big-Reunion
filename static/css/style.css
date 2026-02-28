@@ -487,6 +487,16 @@ body {
   background: var(--chip-color, #64748b);
   opacity: 0.85;
   transition: var(--transition);
+  cursor: pointer;
+  border: none;
+}
+
+.source-chip.inactive {
+  opacity: 0.4;
+  filter: grayscale(80%);
+  background: var(--bg-card);
+  /* Dimmed look */
+  color: var(--text-secondary);
 }
 
 .source-chip:hover {
@@ -622,6 +632,7 @@ body {
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

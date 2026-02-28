@@ -6,11 +6,12 @@ API endpoints for gîtes search, participant management, and cost simulation.
 import json
 import os
 import math
+import threading
 import requests as http_requests
 from urllib.parse import unquote, urlparse
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
-from scraper import search_gites
+from scraper import search_gites, run_deep_scan
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -136,17 +137,65 @@ def api_search_gites():
         budget_max = int(budget_max_str) if budget_max_str else None
         animaux_str = request.args.get("animaux", "").strip().lower()
         animaux = True if animaux_str == "true" else None
+        
+        sources_str = request.args.get("sources", "")
+        sources = sources_str.split(",") if sources_str else None
 
         gites = search_gites(
             capacite_min=capacite_min,
             departement=departement,
             budget_max=budget_max,
             animaux=animaux,
+            sources=sources,
         )
         return jsonify({"success": True, "gites": gites, "count": len(gites)})
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e), "gites": []}), 500
+
+
+@app.route("/api/deep-scan", methods=["POST"])
+def api_deep_scan():
+    """
+    Trigger a deep scan in the background.
+    """
+    try:
+        capacite_min = int(request.json.get("capacite_min", 10)) if request.is_json else 10
+        sources = request.json.get("sources", None) if request.is_json else None
+        
+        # Start in background so it doesn't block the request
+        thread = threading.Thread(target=run_deep_scan, args=(capacite_min, sources))
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({"success": True, "message": "Scan approfondi démarré. Cela peut prendre plusieurs minutes."})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/clear-cache", methods=["POST"])
+def api_clear_cache():
+    """
+    Clear all cached scraper JSON files and deep scan results.
+    """
+    try:
+        import glob
+        deleted = 0
+        cache_files = glob.glob(os.path.join(DATA_DIR, "cache_*.json"))
+        deep_file = os.path.join(DATA_DIR, "deep_gites.json")
+        if os.path.exists(deep_file):
+            cache_files.append(deep_file)
+
+        for filepath in cache_files:
+            try:
+                os.remove(filepath)
+                deleted += 1
+            except Exception as e:
+                pass
+                
+        return jsonify({"success": True, "message": f"{deleted} fichiers de cache supprimés."})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ─── API: Participants ───────────────────────────────────────────────────────

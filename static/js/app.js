@@ -104,14 +104,29 @@ async function apiDelete(endpoint) {
 }
 
 // ─── Gîtes Search ───────────────────────────────────────────────────────────
+function toggleSource(btn) {
+  btn.classList.toggle('inactive');
+  btn.classList.toggle('active');
+}
+
 async function loadGites() {
   const animauxChecked = document.getElementById('filter-animaux')?.checked || false;
+
+  // Collect active sources
+  const activeSources = Array.from(document.querySelectorAll('.source-chip.active'))
+    .map(btn => btn.dataset.source)
+    .filter(Boolean);
+
   const params = new URLSearchParams({
     capacite_min: document.getElementById('filter-capacite')?.value || '10',
     departement: document.getElementById('filter-departement')?.value || '',
     budget_max: document.getElementById('filter-budget')?.value || '',
     animaux: animauxChecked ? 'true' : '',
   });
+
+  if (activeSources.length > 0) {
+    params.append('sources', activeSources.join(','));
+  }
 
   try {
     const data = await apiGet(`/api/gites?${params}`);
@@ -130,12 +145,68 @@ function searchGites() {
   const btn = document.getElementById('btn-search');
   btn.classList.add('loading');
   btn.innerHTML = '<span class="spinner"></span> Recherche...';
+  btn.disabled = true; // Disable button during search
 
   loadGites().finally(() => {
     btn.classList.remove('loading');
-    btn.innerHTML = '🔍 Rechercher';
+    btn.innerHTML = '🔍 Recherche Rapide';
+    btn.disabled = false;
     showToast(`${state.gites.length} gîtes trouvés !`, 'success');
   });
+}
+
+function triggerDeepScan() {
+  const btn = document.getElementById('btn-deep-scan');
+  btn.innerHTML = '🕰️ Lancement...';
+  btn.disabled = true;
+
+  const capacite = document.getElementById('filter-capacite').value || 10;
+
+  // Collect active sources
+  const activeSources = Array.from(document.querySelectorAll('.source-chip.active'))
+    .map(btn => btn.dataset.source)
+    .filter(Boolean);
+
+  apiPost('/api/deep-scan', {
+    capacite_min: capacite,
+    sources: activeSources
+  })
+    .then(data => {
+      if (data && data.success) {
+        showToast(data.message, 'success');
+        btn.innerHTML = '✅ Scan Démarré !';
+        setTimeout(() => {
+          btn.innerHTML = '🕰️ Scan approfondi';
+          btn.disabled = false;
+        }, 5000);
+      } else {
+        throw new Error(data ? data.error : 'Erreur réseau');
+      }
+    })
+    .catch(error => {
+      showToast('❌ Erreur: ' + error.message, 'error');
+      btn.innerHTML = '🕰️ Scan approfondi';
+      btn.disabled = false;
+    });
+}
+
+function clearCache() {
+  if (!confirm("Voulez-vous vraiment vider le cache ? Cela effacera tous les résultats enregistrés et le prochain scan sera plus long.")) return;
+
+  apiPost('/api/clear-cache', {})
+    .then(data => {
+      if (data && data.success) {
+        showToast(data.message, 'success');
+        state.gites = [];
+        renderGites();
+        updateBadges();
+      } else {
+        throw new Error(data ? data.error : 'Erreur réseau');
+      }
+    })
+    .catch(error => {
+      showToast('❌ Erreur lors du vidage du cache: ' + error.message, 'error');
+    });
 }
 
 function renderGites() {
@@ -503,6 +574,9 @@ function renderSimulationResults(data) {
 // ─── Utility ────────────────────────────────────────────────────────────────
 // Expose functions for inline handlers
 window.searchGites = searchGites;
+window.triggerDeepScan = triggerDeepScan;
+window.clearCache = clearCache;
+window.toggleSource = toggleSource;
 window.deleteParticipant = deleteParticipant;
 window.selectGiteForSimulation = selectGiteForSimulation;
 window.runSimulation = runSimulation;

@@ -507,16 +507,14 @@ def _get_stealth_headers(referer: str = "https://www.google.fr/") -> dict:
 
 # Departmental sites with group gîte pages
 GDF_DEPARTMENTS = [
-    ("drome", "Drôme", "26", "locations-de-vacances-grandes-capacites.html"),
-    ("ardeche", "Ardèche", "07", "locations-de-vacances-grandes-capacites.html"),
-    ("deux-sevres", "Deux-Sèvres", "79", "locations-de-vacances-grandes-capacites.html"),
-    ("calvados", "Calvados", "14", "locations-de-vacances-grandes-capacites.html"),
-    ("morbihan", "Morbihan", "56", "locations-de-vacances-grandes-capacites.html"),
-    ("finistere", "Finistère", "29", "locations-de-vacances-grandes-capacites.html"),
-    ("herault", "Hérault", "34", "locations-de-vacances-grandes-capacites.html"),
-    ("vendee", "Vendée", "85", "locations-de-vacances-grandes-capacites.html"),
+    ("drome", "Drôme", "26", "hebergements-groupe-copains-drome.html"),
+    ("ardeche", "Ardèche", "07", "location-gites-de-groupe.html"),
+    ("deux-sevres", "Deux-Sèvres", "79", "gites-groupe.html"),
+    ("paca", "PACA", "83", "liste.html?gitegroupe=o"),
+    ("vendee", "Vendée", "85", "fr/thematiques/gites-groupe-grande-capacite-vendee"),
     ("dordogne", "Dordogne", "24", "locations-de-vacances-grandes-capacites.html"),
-    ("lozere", "Lozère", "48", "locations-de-vacances-grandes-capacites.html"),
+    ("nievre", "Nièvre", "58", "locations-de-vacances-grandes-capacites.html"),
+    ("finistere", "Finistère", "29", "locations-de-vacances-grandes-capacites.html"),
 ]
 
 
@@ -554,34 +552,23 @@ def scrape_gitesdefrance_stealth(capacite_min: int = 10, departement: Optional[s
     if not target_depts:
         return []
 
+    # Limit to 3 random departments if not using a specific one to keep it fast
+    if not departement and len(target_depts) > 3:
+        target_depts = random.sample(target_depts, 3)
+
     for dept_slug, dept_name, dept_num, page_path in target_depts:
         if len(gites) >= MAX_PER_RUN:
             break
         
         base_url = f"https://www.gites-de-france-{dept_slug}.com"
-        group_url = f"{base_url}/{page_path}"
+        group_url = f"{base_url}/{page_path}" if not page_path.startswith('http') else page_path
         
         try:
-            # ── Step 1: Hit homepage first (realistic browsing pattern)
-            logger.info(f"🕵️ GdF Stealth [{dept_name}] — visiting homepage...")
-            homepage_headers = _get_stealth_headers("https://www.google.fr/")
-            resp_home = session.get(base_url + "/", headers=homepage_headers, timeout=REQUEST_TIMEOUT)
-            
-            if resp_home.status_code != 200:
-                logger.warning(f"  {dept_name}: homepage HTTP {resp_home.status_code}, skipping")
-                continue
-            
-            # ── Jitter: random delay simulating human reading
-            jitter = random.uniform(2.0, 5.0)
-            logger.info(f"  ⏱️ Jitter: {jitter:.1f}s")
-            time.sleep(jitter)
-            
-            # ── Step 2: Navigate to group gîtes page (from homepage)
             logger.info(f"  🔍 Fetching group gîtes: {group_url}")
             page_headers = _get_stealth_headers(base_url + "/")
-            page_headers["Sec-Fetch-Site"] = "same-origin"
+            page_headers["Sec-Fetch-Site"] = "none"
             
-            resp = session.get(group_url, headers=page_headers, timeout=REQUEST_TIMEOUT)
+            resp = session.get(group_url, headers=page_headers, timeout=REQUEST_TIMEOUT, allow_redirects=True)
             
             if resp.status_code == 404:
                 # Try alternate URL patterns
@@ -591,7 +578,6 @@ def scrape_gitesdefrance_stealth(capacite_min: int = 10, departement: Optional[s
                     f"{base_url}/hebergement-groupe.html",
                 ]
                 for alt_url in alt_urls:
-                    time.sleep(random.uniform(1.0, 3.0))
                     resp = session.get(alt_url, headers=page_headers, timeout=REQUEST_TIMEOUT)
                     if resp.status_code == 200:
                         logger.info(f"  ✅ Alternate URL worked: {alt_url}")
@@ -928,69 +914,92 @@ def scrape_clevacances_sync(capacite_min: int = 10) -> list[dict]:
 
 # ─── SCRAPER 7: Giga-Location.com (requests) ─────────────────────────────
 def scrape_gigalocation(capacite_min: int = 10) -> list[dict]:
-    """Scrape Giga-Location.com."""
+    """Scrape Giga-Location.com using POST request and extracting from specific containers."""
     gites = []
     try:
-        url = f"https://www.giga-location.com/annonces.php?capacite={capacite_min}"
-        logger.info(f"Scraping Giga-Location: {url}")
+        url = "https://www.giga-location.com/gite-de-groupe/"
+        logger.info(f"Scraping Giga-Location via POST: {url} with capacite_min={capacite_min}")
         
-        response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+        # Giga-location uses a POST request with 'send=1' and 'nb_pers_min'
+        data = {
+            'send': '1',
+            'nb_pers_min': str(capacite_min)
+        }
+        
+        # Increase timeout slightly and allow redirects as it typically redirects to the search results page
+        response = requests.post(url, data=data, headers=HEADERS, timeout=REQUEST_TIMEOUT, allow_redirects=True)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, "lxml")
-        cards = soup.select("article, .annonce, .listing, .card, [class*='gite']")
-        if not cards:
-            links = soup.find_all("a", href=re.compile(r"annonce|gite|location"))
-            cards = links
+        
+        # Listings are contained inside divs with class 'lacase'
+        boxes = soup.find_all("div", class_="lacase")
+        
+        if not boxes:
+            logger.warning("Giga-Location: Found NO 'lacase' boxes despite successful request.")
         
         processed = set()
-        for card in cards[:50]:
+        for box in boxes[:50]:
             try:
-                link = card if card.name == "a" else card.find("a", href=True)
-                if not link:
+                # Get the link
+                link_el = box.find("a", href=True)
+                if not link_el:
                     continue
-                href = link.get("href", "")
+                href = link_el.get("href", "")
                 if href in processed or not href:
                     continue
                 processed.add(href)
                 
-                full_url = f"https://www.giga-location.com/{href}" if not href.startswith("http") else href
+                full_url = f"https://www.giga-location.com{href}" if not href.startswith("http") else href
                 
-                name_el = card.find(["h2", "h3", "h4"]) if hasattr(card, 'find') else None
-                nom = name_el.get_text(strip=True) if name_el else link.get_text(strip=True)[:80]
-                if not nom or len(nom) < 3:
+                # Get name
+                nom = "Gîte Giga-Location"
+                title_el = box.find("div", class_="titre")
+                if title_el:
+                    nom = title_el.get_text(separator=' ', strip=True)
+                
+                if len(nom) < 3:
                     continue
                 
-                img = card.find("img") if hasattr(card, 'find') else None
+                # Get photo
+                img = box.find("img")
                 photo = ""
                 if img:
-                    photo = img.get("src", "")
+                    photo = img.get("data-src") or img.get("src", "")
                     if photo and not photo.startswith("http"):
-                        photo = f"https://www.giga-location.com/{photo}"
+                        photo = f"https://www.giga-location.com{photo}"
+                
+                # Parse text for capacity/price if possible
+                box_text = box.get_text(" ", strip=True)
+                capacite = capacite_min
+                cap_match = re.search(r'(\d+)\s*personnes', box_text, re.I)
+                if cap_match:
+                    capacite = int(cap_match.group(1))
                 
                 gite = {
                     "nom": nom,
                     "url": full_url,
-                    "capacite": capacite_min,
-                    "prix_semaine": None,
+                    "capacite": capacite,
+                    "prix_semaine": None, # Price usually requires looking into the ad details
                     "localisation": "France",
                     "departement": "",
                     "description": "",
                     "equipements": [],
                     "photo": photo,
                     "note": None,
-                    "animaux": False,
+                    "animaux": detect_animaux(box_text),
                     "source": "gigalocation",
                 }
                 gites.append(gite)
                 
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Giga-Location parse error for single box: {e}")
                 continue
         
         logger.info(f"✅ Giga-Location: {len(gites)} listings scraped")
         
     except Exception as e:
-        logger.error(f"❌ Giga-Location error: {e}")
+        logger.error(f"❌ Giga-Location scraping error: {e}")
     
     return gites
 
@@ -1180,6 +1189,71 @@ def scrape_gitesxxl(capacite_min: int = 10, departement: Optional[str] = None) -
     return gites
 
 
+# ─── Deep Scan (Playwright Sites) ──────────────────────────────────────────
+
+def run_deep_scan(capacite_min: int = 10, sources: Optional[list[str]] = None):
+    """
+    Run scrapers that require Playwright/JS rendering.
+    This takes a long time and is intended to be run in a background thread or cron job.
+    Results are saved to data/deep_gites.json
+    """
+    deep_file = os.path.join(DATA_DIR, "deep_gites.json")
+    logger.info(f"🚀 Starting deep scan for capacity {capacite_min} (sources: {sources})...")
+    
+    new_gites = []
+    
+    # Run TopLoc
+    if not sources or "toploc" in sources:
+        try:
+            new_gites.extend(scrape_toploc_sync(capacite_min))
+        except Exception as e:
+            logger.error(f"Deep scan error (TopLoc): {e}")
+
+    # Run GreenGo
+    if not sources or "greengo" in sources:
+        try:
+            new_gites.extend(scrape_greengo_sync(capacite_min))
+        except Exception as e:
+            logger.error(f"Deep scan error (GreenGo): {e}")
+
+    # Run Abritel
+    if not sources or "abritel" in sources:
+        try:
+            new_gites.extend(scrape_abritel_sync(capacite_min))
+        except Exception as e:
+            logger.error(f"Deep scan error (Abritel): {e}")
+
+    # Run Clévacances
+    if not sources or "clevacances" in sources:
+        try:
+            new_gites.extend(scrape_clevacances_sync(capacite_min))
+        except Exception as e:
+            logger.error(f"Deep scan error (Clévacances): {e}")
+
+    # Load existing results and merge
+    gites = []
+    try:
+        if os.path.exists(deep_file):
+            with open(deep_file, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+            # Remove existing gites from the sources we just scanned
+            scanned_sources = sources if sources else ["toploc", "greengo", "abritel", "clevacances"]
+            gites = [g for g in existing if g.get("source") not in scanned_sources]
+    except Exception as e:
+        logger.error(f"Could not load existing deep_gites: {e}")
+        
+    gites.extend(new_gites)
+
+    # Save to disk
+    try:
+        with open(deep_file, "w", encoding="utf-8") as f:
+            json.dump(gites, f, ensure_ascii=False, indent=2)
+        logger.info(f"✅ Deep scan complete: {len(gites)} gîtes saved to {deep_file}")
+    except Exception as e:
+        logger.error(f"Failed to save deep scan results: {e}")
+
+    return gites
+
 # ─── Main search function ───────────────────────────────────────────────────
 
 def search_gites(
@@ -1188,6 +1262,7 @@ def search_gites(
     budget_max: Optional[int] = None,
     animaux: Optional[bool] = None,
     use_demo: bool = False,  # Kept for API compat, but ignored
+    sources: Optional[list[str]] = None,
 ) -> list[dict]:
     """
     Main search function. Scrapes REAL listings from all sources.
@@ -1212,32 +1287,51 @@ def search_gites(
         source_status = {}
         
         # 1. GrandsGites (requests — fast, reliable)
-        try:
-            result = scrape_grandsgites(capacite_min, departement=departement)
-            gites.extend(result)
-            source_status["grandsgites"] = f"✅ {len(result)}"
-        except Exception as e:
-            source_status["grandsgites"] = f"❌ {e}"
+        if not sources or "grandsgites" in sources:
+            try:
+                result = scrape_grandsgites(capacite_min, departement=departement)
+                gites.extend(result)
+                source_status["grandsgites"] = f"✅ {len(result)}"
+            except Exception as e:
+                source_status["grandsgites"] = f"❌ {e}"
         
         # 2. GitesXXL (requests — fast, department pages)
-        try:
-            result = scrape_gitesxxl(capacite_min, departement=departement)
-            gites.extend(result)
-            source_status["gitesxxl"] = f"✅ {len(result)}"
-        except Exception as e:
-            source_status["gitesxxl"] = f"❌ {e}"
+        if not sources or "gitesxxl" in sources:
+            try:
+                result = scrape_gitesxxl(capacite_min, departement=departement)
+                gites.extend(result)
+                source_status["gitesxxl"] = f"✅ {len(result)}"
+            except Exception as e:
+                source_status["gitesxxl"] = f"❌ {e}"
         
         # 3. Gîtes de France — STEALTH (departmental bypass)
-        try:
-            result = scrape_gitesdefrance_stealth(capacite_min, departement=departement)
-            gites.extend(result)
-            source_status["gitesdefrance"] = f"✅ {len(result)}"
-        except Exception as e:
-            source_status["gitesdefrance"] = f"❌ {e}"
+        if not sources or "gitesdefrance" in sources:
+            try:
+                result = scrape_gitesdefrance_stealth(capacite_min, departement=departement)
+                gites.extend(result)
+                source_status["gitesdefrance"] = f"✅ {len(result)}"
+            except Exception as e:
+                source_status["gitesdefrance"] = f"❌ {e}"
         
-        # NOTE: The following sources are still disabled:
-        # - Giga-Location, TopLoc, GreenGo, Abritel, Clévacances
-        # These sites use SPAs or aggressive anti-bot measures.
+        # 4. Giga-Location (requests)
+        if not sources or "gigalocation" in sources:
+            try:
+                result = scrape_gigalocation(capacite_min)
+                gites.extend(result)
+                source_status["gigalocation"] = f"✅ {len(result)}"
+            except Exception as e:
+                source_status["gigalocation"] = f"❌ {e}"
+        
+        # 5. Load deep scan results if they exist (from background jobs)
+        deep_file = os.path.join(DATA_DIR, "deep_gites.json")
+        if os.path.exists(deep_file):
+            try:
+                with open(deep_file, "r", encoding="utf-8") as f:
+                    deep_results = json.load(f)
+                gites.extend(deep_results)
+                source_status["deep_scan"] = f"✅ {len(deep_results)} loaded"
+            except Exception as e:
+                source_status["deep_scan"] = f"❌ {e}"
         
         # Assign unique IDs
         for idx, g in enumerate(gites, start=1):
@@ -1250,13 +1344,15 @@ def search_gites(
             logger.info(f"  {src}: {status}")
         logger.info("=" * 60)
         
-        # Cache results
-        if gites:
+        # Cache results (only if we did a full scan, so we don't overwrite with partial results)
+        if gites and not sources:
             save_cache(gites, departement=departement)
     
     # Apply filters
     filtered = []
     for g in gites:
+        if sources and g.get("source") and g["source"] not in sources:
+            continue
         if g.get("capacite", 0) < capacite_min:
             continue
         if departement and g.get("departement") and g["departement"] != departement:

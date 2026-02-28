@@ -17,18 +17,18 @@
       "[class*='gite']": 3,
       ".item": 13
     },
-    "html_chunk": "<div class=\"item itemProd itemListe T gestion-P\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-numheber=\"1312\" href=\"javascript:void(0);\" onclick=\"ajouterAuPanier('gites79_b2026.1.1312.GE','1','','afficheRetourAjaxPanier');ajouterClassePanier('1312');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<p class=\"p_infoReservableEnligne\"><span class=\"span_reservableEnLigne dispogite\">Réservation en ligne instantanée</span></p>\n<div class=\"vignette\">\n<div class=\"div_sliderMobile\"><div class=\"div_sliderMobileContent\"><a class=\"urlLienFiche\" href=\"/location-vacances-Deux-sevres-Gite-etape-a-Bougon-79G1312.html\" target=\"_blank\" title=\"\"><img alt=\"Gîte de groupe n°1312 Bougon - Deux-Sèvres - photo\" data-defaut=\"/img/css/tranparent-photoHeber.gif\" data-ident=\"gites79_b2026.1.1312.GE\" data-labelevent=\"20-79-79G1312-18-1-0\" data-original=\"/photos/g"
+    "html_chunk": "<div class=\"item itemProd itemListe T gestion-P\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-numheber=\"7301\" href=\"javascript:void(0);\" onclick=\"ajouterAuPanier('gites79_b2026.1.7301.GE','1','','afficheRetourAjaxPanier');ajouterClassePanier('7301');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<div class=\"vignette\">\n<div class=\"div_sliderMobile\"><div class=\"div_sliderMobileContent\"><a class=\"urlLienFiche\" href=\"/location-vacances-Deux-sevres-Gite-etape-a-Saint-marc-la-lande-79G7301.html\" target=\"_blank\" title=\"\"><img alt=\"Gîte de groupe n°7301 Saint-Marc-la-Lande - Deux-Sèvres - photo\" data-defaut=\"/img/css/tranparent-photoHeber.gif\" data-ident=\"gites79_b2026.1.7301.GE\" data-labelevent=\"20-79-79G7301-10-1-0\" data-original=\"/photos/gites79/G/photo/7301_289_450.jpg\" data-phprincip=\"/photos/gites79/G/photo/7301_289_450.jpg\" data-pos="
   },
   "PACA GdF": {
     "status": 200,
     "url": "https://www.gites-de-france-paca.com/liste.html?gitegroupe=o",
     "selectors": {
-      ".fiche": 8,
-      "[class*='gite']": 4,
-      "[class*='fiche']": 8,
+      ".fiche": 4,
+      "[class*='gite']": 5,
+      "[class*='fiche']": 4,
       ".item": 30
     },
-    "html_chunk": "<div class=\"item itemProd itemListe T gestion-C\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-numheber=\"G155130\" href=\"javascript:void(0);\" onclick=\"ajouterAuPanier('gites04_b2026.1.G155130.GE','1','','afficheRetourAjaxPanier');ajouterClassePanier('G155130');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<p class=\"p_infoReservableEnligne\"><span class=\"span_reservableEnLigne\">Réservation en ligne instantanée</span></p>\n<div class=\"vignette\">\n<div class=\"div_sliderMobile\"><div class=\"div_sliderMobileContent\"><a class=\"urlLienFiche\" href=\"/location-vacances-Alpes-de-haute-provence-Gite-etape-a-Bayons-04G155130.html\" target=\"_blank\" title=\"\"><img alt=\"Gîte de groupe n°G155130 Bayons - Alpes-de-Haute-Provence - photo\" data-defaut=\"/img/css/tranparent-photoHeber.gif\" data-ident=\"gites04_b2026.1.G155130.GE\" data-labelevent=\"21-04-04G155130"
+    "html_chunk": "<div class=\"item itemProd itemListe T gestion-P\">\n<div>\n<div class=\"btSelection\"><a class=\"a_ajoutPanier\" data-numheber=\"9430\" href=\"javascript:void(0);\" onclick=\"ajouterAuPanier('gites05_b2026.1.9430.SE','1','','afficheRetourAjaxPanier');ajouterClassePanier('9430');\" rel=\"nofollow\" title=\"Ajouter à ma sélection\"><span class=\"bouton_selection span_ajoutPanier_lbl\" data-code=\"lst_ajoutPanier\" data-gaaction=\"1\">Ajouter à ma sélection</span></a></div>\n<div class=\"vignette\">\n<div class=\"div_sliderMobile\"><div class=\"div_sliderMobileContent\"><a class=\"urlLienFiche\" href=\"/location-vacances-Hautes-alpes-Gites-etape-sejour-a-Puy-saint-vincent-05G9430.html\" target=\"_blank\" title=\"\"><img alt=\"Gite de groupe n°9430 Puy-Saint-Vincent - Hautes-Alpes - photo\" data-defaut=\"/img/css/tranparent-photoHeber.gif\" data-ident=\"gites05_b2026.1.9430.SE\" data-labelevent=\"21-05-05G9430-14-1-0\" data-original=\"/photos/gites05/G/photo/9430_289_450.jpg\" data-phprincip=\"/photos/gites05/G/photo/9430_289_450.jpg\" dat"
   },
   "Vendée GdF": {
     "status": 200,

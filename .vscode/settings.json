@@ -1,6 +1,5 @@
 {
-    "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",
-    "python.experiments.enabled": false,
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     "python.terminal.activateEnvironment": true,
     "python.terminal.activateEnvInSelectedTerminal": true,
     "python.analysis.extraPaths": [
@@ -10,9 +9,8 @@
         "**/.venv",
         "**/__pycache__"
     ],
-    "python.languageServer": "Pylance",
+    "python.languageServer": "Default",
     "python.analysis.typeCheckingMode": "basic",
-    "python.locatorIterativeSearch": false,
     "editor.formatOnSave": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.python",
