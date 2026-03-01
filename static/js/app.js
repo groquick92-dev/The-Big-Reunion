@@ -20,7 +20,8 @@ let state = {
   totals: { total_adultes: 0, total_enfants: 0, total_bebes: 0, total_personnes: 0, nb_foyers: 0 },
   currentTab: 'search',
   simulation: null,
-  selectedRegions: new Set()
+  selectedRegions: new Set(),
+  sortBy: ''
 };
 
 // ─── Map Data & Config ──────────────────────────────────────────────────────
@@ -47,7 +48,7 @@ let geoJsonLayer = null;
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   loadParticipants();
-  loadGites();
+  showInitialEmptyState();
   setupParticipantForm();
   setupSimulator();
   initMap();
@@ -66,17 +67,14 @@ function initTabs() {
 function switchTab(tabName) {
   state.currentTab = tabName;
 
-  // Update buttons
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabName);
   });
 
-  // Update panels
   document.querySelectorAll('.tab-panel').forEach(panel => {
     panel.classList.toggle('active', panel.id === `panel-${tabName}`);
   });
 
-  // Refresh data on tab switch
   if (tabName === 'participants') {
     loadParticipants();
   } else if (tabName === 'simulator') {
@@ -121,10 +119,43 @@ async function apiDelete(endpoint) {
   return res.json();
 }
 
-// ─── Gîtes Search ───────────────────────────────────────────────────────────
+// ─── Gîtes Loading ──────────────────────────────────────────────────────────
+function showInitialEmptyState() {
+  const grid = document.getElementById('gites-grid');
+  if (!grid) return;
+  const toolbar = document.getElementById('gites-toolbar');
+  if (toolbar) toolbar.style.display = 'none';
+  grid.innerHTML = `
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <div class="empty-state-icon">🗺️</div>
+      <div class="empty-state-title">Choisissez une région</div>
+      <div class="empty-state-text">Cliquez sur une ou plusieurs régions sur la carte ci-dessus, ou utilisez le bouton <strong>Toute la France</strong>, puis lancez la recherche.</div>
+    </div>
+  `;
+}
+
+function showLoadingSkeleton() {
+  const grid = document.getElementById('gites-grid');
+  if (!grid) return;
+  const toolbar = document.getElementById('gites-toolbar');
+  if (toolbar) toolbar.style.display = 'none';
+  grid.innerHTML = Array(6).fill(0).map(() => `
+    <div class="gite-card skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="gite-body" style="padding: 1.25rem;">
+        <div class="skeleton-line sk-title"></div>
+        <div class="skeleton-line sk-short"></div>
+        <div class="skeleton-line sk-medium"></div>
+        <div class="skeleton-line sk-short" style="margin-top:0.5rem;"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function toggleSource(btn) {
   btn.classList.toggle('inactive');
   btn.classList.toggle('active');
+  renderGites(); // Client-side filter, no re-fetch needed
 }
 
 // ─── Map Logic ──────────────────────────────────────────────────────────────
@@ -139,16 +170,14 @@ async function initMap() {
     scrollWheelZoom: false,
     doubleClickZoom: false,
     boxZoom: false
-  }).setView([46.603354, 1.888334], 5.4);
+  }).setView([46.603354, 1.888334], 5.5);
 
-  // Add a beautiful dark theme tile layer
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(franceMap);
 
-  // Fetch GeoJSON of French Regions from local static file to avoid CORS/loading issues
   try {
     const res = await fetch('/static/regions.geojson');
     const geoData = await res.json();
@@ -166,7 +195,6 @@ async function initMap() {
         };
       },
       onEachFeature: (feature, layer) => {
-        // Add a tooltip for hovering
         layer.bindTooltip(feature.properties.nom, { sticky: true, className: 'region-tooltip' });
 
         layer.on({
@@ -188,31 +216,11 @@ async function initMap() {
         });
       }
     }).addTo(franceMap);
+
+    franceMap.fitBounds(geoJsonLayer.getBounds());
+
   } catch (err) {
     console.error('Erreur chargement carte:', err);
-  }
-}
-
-function toggleMap() {
-  const wrapper = document.getElementById('map-wrapper');
-  if (wrapper.style.display === 'none') {
-    wrapper.style.display = 'block';
-    document.getElementById('toggle-map-btn').innerHTML = '🗺️ Masquer la carte';
-
-    // Fix leaflet size rendering issue after container un-hide
-    if (franceMap) {
-      setTimeout(() => {
-        franceMap.invalidateSize();
-      }, 100);
-
-      // Secondary check for slow CSS transitions
-      setTimeout(() => {
-        franceMap.invalidateSize();
-      }, 400);
-    }
-  } else {
-    wrapper.style.display = 'none';
-    document.getElementById('toggle-map-btn').innerHTML = '🗺️ Afficher la carte';
   }
 }
 
@@ -241,7 +249,6 @@ function toggleRegion(regionName, layer) {
 function removeRegion(regionName) {
   state.selectedRegions.delete(regionName);
 
-  // Reset style on map
   if (geoJsonLayer) {
     geoJsonLayer.eachLayer(layer => {
       if (layer.feature.properties.nom === regionName) {
@@ -254,14 +261,33 @@ function removeRegion(regionName) {
   renderSelectedRegionsChips();
 }
 
+function selectAllRegions() {
+  Object.keys(REGIONS_DEPTS).forEach(region => state.selectedRegions.add(region));
+
+  if (geoJsonLayer) {
+    geoJsonLayer.eachLayer(layer => {
+      layer.setStyle({
+        fillColor: '#6366f1',
+        weight: 2,
+        color: '#ffffff',
+        dashArray: '',
+        fillOpacity: 0.8
+      });
+    });
+  }
+
+  updateDepartementsInput();
+  renderSelectedRegionsChips();
+}
+
 function renderSelectedRegionsChips() {
   const container = document.getElementById('selected-regions-chips');
   if (!container) return;
 
   container.innerHTML = Array.from(state.selectedRegions).map(region => `
-    <div class="source-chip" style="background: var(--primary); font-size: 0.8rem; display: flex; align-items: center; gap: 6px; padding: 6px 14px;">
+    <div class="region-chip">
       ${region}
-      <span style="cursor: pointer; font-weight: bold; background: rgba(0,0,0,0.2); border-radius: 50%; padding: 0 4px;" onclick="removeRegion('${region}')">&times;</span>
+      <span class="region-chip-remove" onclick="removeRegion('${region.replace(/'/g, "\\'")}')">×</span>
     </div>
   `).join('');
 }
@@ -276,18 +302,13 @@ function updateDepartementsInput() {
 
   const input = document.getElementById('filter-departement');
   if (input) {
-    if (allDepts.length > 0) {
-      input.value = allDepts.join(', ');
-    } else {
-      input.value = '';
-    }
+    input.value = allDepts.length > 0 ? allDepts.join(', ') : '';
   }
 }
 
 async function loadGites() {
   const animauxChecked = document.getElementById('filter-animaux')?.checked || false;
 
-  // Collect active sources
   const activeSources = Array.from(document.querySelectorAll('.source-chip.active'))
     .map(btn => btn.dataset.source)
     .filter(Boolean);
@@ -312,21 +333,38 @@ async function loadGites() {
     }
   } catch (err) {
     console.error('Failed to load gîtes:', err);
+    const grid = document.getElementById('gites-grid');
+    if (grid) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-state-icon">⚠️</div>
+          <div class="empty-state-title">Erreur de chargement</div>
+          <div class="empty-state-text">Impossible de contacter le serveur. Vérifiez que l'application est bien démarrée.</div>
+        </div>
+      `;
+    }
     showToast('Erreur lors du chargement des gîtes', 'error');
   }
 }
 
 function searchGites() {
+  if (state.selectedRegions.size === 0) {
+    showToast('Veuillez sélectionner au moins une région sur la carte', 'error');
+    return;
+  }
+
   const btn = document.getElementById('btn-search');
   btn.classList.add('loading');
   btn.innerHTML = '<span class="spinner"></span> Recherche...';
-  btn.disabled = true; // Disable button during search
+  btn.disabled = true;
+
+  showLoadingSkeleton();
 
   loadGites().finally(() => {
     btn.classList.remove('loading');
-    btn.innerHTML = '🔍 Recherche Rapide';
+    btn.innerHTML = '🔍 Lancer la recherche';
     btn.disabled = false;
-    showToast(`${state.gites.length} gîtes trouvés !`, 'success');
+    showToast(`${state.gites.length} gîte${state.gites.length !== 1 ? 's' : ''} trouvé${state.gites.length !== 1 ? 's' : ''} !`, 'success');
   });
 }
 
@@ -337,7 +375,6 @@ function triggerDeepScan() {
 
   const capacite = document.getElementById('filter-capacite').value || 10;
 
-  // Collect active sources
   const activeSources = Array.from(document.querySelectorAll('.source-chip.active'))
     .map(btn => btn.dataset.source)
     .filter(Boolean);
@@ -359,14 +396,14 @@ function triggerDeepScan() {
       }
     })
     .catch(error => {
-      showToast('❌ Erreur: ' + error.message, 'error');
+      showToast('Erreur: ' + error.message, 'error');
       btn.innerHTML = '🕰️ Scan approfondi';
       btn.disabled = false;
     });
 }
 
 function clearCache() {
-  if (!confirm("Voulez-vous vraiment vider le cache ? Cela effacera tous les résultats enregistrés et le prochain scan sera plus long.")) return;
+  if (!confirm("Vider le cache ? Les résultats enregistrés seront effacés et la prochaine recherche sera plus longue.")) return;
 
   apiPost('/api/clear-cache', {})
     .then(data => {
@@ -380,27 +417,90 @@ function clearCache() {
       }
     })
     .catch(error => {
-      showToast('❌ Erreur lors du vidage du cache: ' + error.message, 'error');
+      showToast('Erreur lors du vidage du cache: ' + error.message, 'error');
     });
 }
 
+// ─── Amenity helpers ─────────────────────────────────────────────────────────
+function matchesAmenity(gite, ...keywords) {
+  const haystack =
+    (gite.equipements || []).join(' ').toLowerCase() + ' ' +
+    (gite.description || '').toLowerCase() +
+    (gite.nom || '').toLowerCase();
+  return keywords.some(kw => haystack.includes(kw));
+}
+
+// ─── Sort ────────────────────────────────────────────────────────────────────
+function applySort() {
+  const select = document.getElementById('sort-select');
+  state.sortBy = select ? select.value : '';
+  renderGites();
+}
+
+// ─── Render Gîtes ───────────────────────────────────────────────────────────
 function renderGites() {
   const grid = document.getElementById('gites-grid');
-  if (!state.gites.length) {
+  if (!grid) return;
+
+  // Client-side source filtering
+  const activeSources = new Set(
+    Array.from(document.querySelectorAll('.source-chip.active'))
+      .map(b => b.dataset.source)
+      .filter(Boolean)
+  );
+
+  let gites = activeSources.size > 0
+    ? state.gites.filter(g => !g.source || activeSources.has(g.source))
+    : [...state.gites];
+
+  // Client-side amenity filters
+  if (document.getElementById('filter-piscine')?.checked)
+    gites = gites.filter(g => matchesAmenity(g, 'piscine'));
+  if (document.getElementById('filter-salle')?.checked)
+    gites = gites.filter(g => matchesAmenity(g, 'salle de réception', 'salle reception', 'salle de fête', 'salle fete'));
+  if (document.getElementById('filter-barbecue')?.checked)
+    gites = gites.filter(g => matchesAmenity(g, 'barbecue', 'plancha', 'brasero'));
+  if (document.getElementById('filter-pmr')?.checked)
+    gites = gites.filter(g => matchesAmenity(g, 'handicap', 'pmr', 'accessible', 'mobilité réduite'));
+  if (document.getElementById('filter-jardin')?.checked)
+    gites = gites.filter(g => matchesAmenity(g, 'jardin', 'terrain', 'parc', 'prairie', 'espace extérieur'));
+
+  // Apply sort
+  if (state.sortBy === 'price-asc') {
+    gites.sort((a, b) => (a.prix_semaine || Infinity) - (b.prix_semaine || Infinity));
+  } else if (state.sortBy === 'price-desc') {
+    gites.sort((a, b) => (b.prix_semaine || 0) - (a.prix_semaine || 0));
+  } else if (state.sortBy === 'capacity-desc') {
+    gites.sort((a, b) => (b.capacite || 0) - (a.capacite || 0));
+  } else if (state.sortBy === 'rating-desc') {
+    gites.sort((a, b) => (b.note || 0) - (a.note || 0));
+  }
+
+  // Toolbar
+  const toolbar = document.getElementById('gites-toolbar');
+  const toolbarCount = document.getElementById('toolbar-count');
+  if (toolbar) toolbar.style.display = state.gites.length > 0 ? 'flex' : 'none';
+  if (toolbarCount) {
+    const filtered = gites.length < state.gites.length;
+    toolbarCount.textContent = filtered
+      ? `${gites.length} / ${state.gites.length} gîtes affichés`
+      : `${gites.length} gîte${gites.length !== 1 ? 's' : ''} trouvé${gites.length !== 1 ? 's' : ''}`;
+  }
+
+  if (!gites.length) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column: 1 / -1;">
         <div class="empty-state-icon">🏡</div>
-        <div class="empty-state-title">Aucun gîte trouvé</div>
-        <div class="empty-state-text">Modifiez vos filtres de recherche ou essayez une capacité plus petite.</div>
+        <div class="empty-state-title">${state.gites.length > 0 ? 'Aucun gîte pour ces sources' : 'Aucun gîte trouvé'}</div>
+        <div class="empty-state-text">${state.gites.length > 0 ? 'Activez d\'autres sources de données ci-dessus.' : 'Modifiez vos filtres de recherche ou essayez une capacité plus petite.'}</div>
       </div>
     `;
     return;
   }
 
-  grid.innerHTML = state.gites.map(gite => {
+  grid.innerHTML = gites.map(gite => {
     const src = SOURCE_INFO[gite.source] || { name: 'Autre', color: '#64748b' };
     const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop';
-    // Proxy external images through our server to bypass hotlink protection
     let photoUrl = FALLBACK_IMG;
     if (gite.photo) {
       if (gite.photo.startsWith('http')) {
@@ -409,10 +509,18 @@ function renderGites() {
         photoUrl = gite.photo;
       }
     }
+
+    // Price per person estimate if participants known
+    let pricePerPersonHtml = '';
+    if (gite.prix_semaine && state.totals.total_personnes > 0) {
+      const ppp = Math.round(gite.prix_semaine / state.totals.total_personnes);
+      pricePerPersonHtml = `<div class="gite-ppp">≈ ${ppp}€/pers.</div>`;
+    }
+
     return `
     <div class="gite-card" data-id="${gite.id}">
       <div class="gite-image-wrap">
-        <img class="gite-image" src="${photoUrl}" 
+        <img class="gite-image" src="${photoUrl}"
              alt="${gite.nom}" loading="lazy"
              onerror="this.src='${FALLBACK_IMG}'">
         <div class="gite-capacity-badge">👥 ${gite.capacite} pers.</div>
@@ -428,8 +536,11 @@ function renderGites() {
           ${(gite.equipements || []).slice(0, 4).map(eq => `<span class="gite-tag">${eq}</span>`).join('')}
         </div>
         <div class="gite-footer">
-          <div class="gite-price">
-            ${gite.prix_semaine ? `${gite.prix_semaine.toLocaleString('fr-FR')}€ <small>/semaine</small>` : '<small>Prix sur demande</small>'}
+          <div class="gite-price-wrap">
+            <div class="gite-price">
+              ${gite.prix_semaine ? `${gite.prix_semaine.toLocaleString('fr-FR')}€ <small>/semaine</small>` : '<small>Prix sur demande</small>'}
+            </div>
+            ${pricePerPersonHtml}
           </div>
           <div class="gite-actions">
             <button class="btn-gite btn-gite-primary" onclick="selectGiteForSimulation(${gite.id})">
@@ -682,9 +793,10 @@ function renderSimulationResults(data) {
 
   const sim = data.simulation;
   const rep = data.repartition;
+  const maxCost = Math.max(...rep.map(r => r.cout_total));
 
   container.innerHTML = `
-    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+    <h3 class="sim-results-title">
       📊 Résultats de la simulation
     </h3>
 
@@ -703,21 +815,17 @@ function renderSimulationResults(data) {
       </div>
     </div>
 
-    <div class="glass-card" style="margin-bottom: 1rem; padding: 1rem 1.25rem;">
-      <div style="display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-secondary);">
-        <span>📋 <strong>${sim.totals.nb_foyers}</strong> foyers</span>
-        <span>🧑 <strong>${sim.totals.total_adultes}</strong> adultes</span>
-        <span>👧 <strong>${sim.totals.total_enfants}</strong> enfants</span>
-        <span>👶 <strong>${sim.totals.total_bebes}</strong> bébés</span>
-        <span>📅 <strong>${sim.nb_jours}</strong> jours</span>
-        <span>🍽️ <strong>${sim.frais_adulte_jour}€</strong>/adulte/jour</span>
-        <span>🧃 <strong>${sim.frais_enfant_jour}€</strong>/enfant/jour</span>
-      </div>
+    <div class="sim-meta glass-card">
+      <span>📋 <strong>${sim.totals.nb_foyers}</strong> foyers</span>
+      <span>🧑 <strong>${sim.totals.total_adultes}</strong> adultes</span>
+      <span>👧 <strong>${sim.totals.total_enfants}</strong> enfants</span>
+      <span>👶 <strong>${sim.totals.total_bebes}</strong> bébés</span>
+      <span>📅 <strong>${sim.nb_jours}</strong> jours</span>
+      <span>🍽️ <strong>${sim.frais_adulte_jour}€</strong>/adulte/j</span>
+      <span>🧃 <strong>${sim.frais_enfant_jour}€</strong>/enfant/j</span>
     </div>
 
-    <h4 style="font-family: 'Outfit', sans-serif; margin: 1.5rem 0 1rem; font-size: 1.1rem;">
-      💸 Répartition par foyer
-    </h4>
+    <h4 class="sim-section-title">💸 Répartition par foyer</h4>
 
     <table class="repartition-table">
       <thead>
@@ -732,9 +840,9 @@ function renderSimulationResults(data) {
       </thead>
       <tbody>
         ${rep.map(r => `
-          <tr>
+          <tr class="${r.cout_total === maxCost ? 'row-highlight' : ''}">
             <td class="td-foyer">${r.nom_foyer}</td>
-            <td>${r.adultes}A ${r.enfants ? `+ ${r.enfants}E` : ''} ${r.bebes ? `+ ${r.bebes}B` : ''}</td>
+            <td>${r.adultes}A${r.enfants ? ` + ${r.enfants}E` : ''}${r.bebes ? ` + ${r.bebes}B` : ''}</td>
             <td>${r.parts}</td>
             <td>${r.cout_hebergement.toLocaleString('fr-FR')}€</td>
             <td>${r.cout_bouche.toLocaleString('fr-FR')}€</td>
@@ -746,8 +854,8 @@ function renderSimulationResults(data) {
   `;
 }
 
-// ─── Utility ────────────────────────────────────────────────────────────────
-// Expose functions for inline handlers
+// ─── Expose globals for inline handlers ─────────────────────────────────────
+window.renderGites = renderGites;
 window.searchGites = searchGites;
 window.triggerDeepScan = triggerDeepScan;
 window.clearCache = clearCache;
@@ -755,5 +863,6 @@ window.toggleSource = toggleSource;
 window.deleteParticipant = deleteParticipant;
 window.selectGiteForSimulation = selectGiteForSimulation;
 window.runSimulation = runSimulation;
-window.toggleMap = toggleMap;
 window.removeRegion = removeRegion;
+window.selectAllRegions = selectAllRegions;
+window.applySort = applySort;

@@ -86,9 +86,7 @@
             <div class="filter-group focus-group">
               <div class="filter-label-row">
                 <label class="filter-label">📍 Localisation (Régions/Dép.)</label>
-                <button id="toggle-map-btn" class="btn-micro" onclick="toggleMap()">
-                  🗺️ Afficher la carte
-                </button>
+                <button type="button" class="btn-all-france" onclick="selectAllRegions()">🗺️ Toute la France</button>
               </div>
               <input type="text" id="filter-departement" class="filter-input input-glow"
                 placeholder="Ex: 24, 33, 83... (ou cliquez sur la carte)">
@@ -97,7 +95,7 @@
 
               <!-- Carte interactive -->
               <div id="map-wrapper"
-                style="display: none; margin-top: 1rem; height: 400px; width: 100%; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; z-index: 10;">
+                style="margin-top: 1rem; height: 400px; width: 100%; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; z-index: 10;">
                 <div id="france-map" style="height: 100%; width: 100%; background-color: var(--bg-dark);"></div>
               </div>
             </div>
@@ -123,6 +121,31 @@
                 <input type="checkbox" id="filter-animaux">
                 <span class="toggle-slider"></span>
                 <span class="toggle-label text-sm">🐾 Animaux acceptés</span>
+              </label>
+              <label class="toggle-switch" for="filter-piscine">
+                <input type="checkbox" id="filter-piscine" onchange="renderGites()">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label text-sm">🏊 Piscine</span>
+              </label>
+              <label class="toggle-switch" for="filter-salle">
+                <input type="checkbox" id="filter-salle" onchange="renderGites()">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label text-sm">🏛️ Salle de réception</span>
+              </label>
+              <label class="toggle-switch" for="filter-barbecue">
+                <input type="checkbox" id="filter-barbecue" onchange="renderGites()">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label text-sm">🔥 Barbecue / Plancha</span>
+              </label>
+              <label class="toggle-switch" for="filter-pmr">
+                <input type="checkbox" id="filter-pmr" onchange="renderGites()">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label text-sm">♿ Accès PMR</span>
+              </label>
+              <label class="toggle-switch" for="filter-jardin">
+                <input type="checkbox" id="filter-jardin" onchange="renderGites()">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label text-sm">🌿 Grand jardin / Terrain</span>
               </label>
             </div>
             <div class="search-actions">
@@ -152,14 +175,20 @@
         </div>
       </div>
 
-      <!-- Gîtes Grid -->
-      <div id="gites-grid" class="gites-grid">
-        <div class="empty-state" style="grid-column: 1 / -1;">
-          <div class="loader-spinner"></div>
-          <div class="empty-state-title mt-4">Chargement des gîtes...</div>
-          <div class="empty-state-text">Nous cherchons les meilleures options disponibles en temps réel.</div>
-        </div>
+      <!-- Results Toolbar -->
+      <div id="gites-toolbar" class="gites-toolbar" style="display:none">
+        <div class="toolbar-count" id="toolbar-count"></div>
+        <select id="sort-select" class="sort-select" onchange="applySort()">
+          <option value="">Trier par défaut</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+          <option value="capacity-desc">Plus grande capacité</option>
+          <option value="rating-desc">Meilleures notes</option>
+        </select>
       </div>
+
+      <!-- Gîtes Grid -->
+      <div id="gites-grid" class="gites-grid"></div>
     </section>
 
     <!-- ═══ Tab: Participants ═══════════════════════════════════════════ -->

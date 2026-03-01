@@ -11,9 +11,7 @@ import re
 import time
 import random
 import logging
-import asyncio
 from typing import Optional
-from concurrent.futures import ThreadPoolExecutor
 
 import requests
 from bs4 import BeautifulSoup
@@ -1336,14 +1334,15 @@ def search_gites(
     filtered = []
     seen_urls = set()
     for g in all_gites:
-        # Deduplicate by url
-        if g.get("url") in seen_urls:
+        # Deduplicate by url — skip entries with no URL
+        url = g.get("url") or ""
+        if not url or url in seen_urls:
             continue
-        seen_urls.add(g.get("url"))
-        
+        seen_urls.add(url)
+
         if sources and g.get("source") and g["source"] not in sources:
             continue
-        if g.get("capacite", 0) < capacite_min:
+        if int(g.get("capacite") or 0) < capacite_min:
             continue
         if departements and g.get("departement") and g["departement"] not in departements:
             continue
