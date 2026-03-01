@@ -892,10 +892,10 @@ function toggleMap() {
     wrapper.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin-top 0.3s ease';
     wrapper.style.overflow = 'hidden';
     if (state.mapVisible) {
-      wrapper.style.height = '400px';
+      wrapper.style.setProperty('height', '400px', 'important');
       wrapper.style.marginTop = '1rem';
     } else {
-      wrapper.style.height = '0';
+      wrapper.style.setProperty('height', '0px', 'important');
       wrapper.style.marginTop = '0';
     }
   }
