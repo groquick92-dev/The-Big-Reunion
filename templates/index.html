@@ -94,6 +94,10 @@
               <div id="selected-regions-chips" class="mt-2 flex flex-wrap gap-2"></div>
 
               <!-- Carte interactive -->
+              <button type="button" class="map-toggle-btn" id="map-toggle-btn" onclick="toggleMap()">
+                <span>🗺️ Carte interactive</span>
+                <span id="map-toggle-arrow">▲</span>
+              </button>
               <div id="map-wrapper"
                 style="margin-top: 1rem; height: 400px; width: 100%; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); position: relative; z-index: 10;">
                 <div id="france-map" style="height: 100%; width: 100%; background-color: var(--bg-dark);"></div>
@@ -175,16 +179,35 @@
         </div>
       </div>
 
+      <!-- Scraping Progress -->
+      <div id="scraping-progress" class="scraping-progress" style="display:none">
+        <div class="scraping-progress-header">
+          <span class="scraping-progress-label" id="scraping-label">🔍 Initialisation...</span>
+          <span class="scraping-step-count" id="scraping-step">0 / 4</span>
+        </div>
+        <div class="scraping-progress-track">
+          <div class="scraping-progress-fill" id="scraping-fill"></div>
+        </div>
+        <div class="scraping-sources-dots" id="scraping-dots"></div>
+      </div>
+
       <!-- Results Toolbar -->
       <div id="gites-toolbar" class="gites-toolbar" style="display:none">
         <div class="toolbar-count" id="toolbar-count"></div>
-        <select id="sort-select" class="sort-select" onchange="applySort()">
-          <option value="">Trier par défaut</option>
-          <option value="price-asc">Prix croissant</option>
-          <option value="price-desc">Prix décroissant</option>
-          <option value="capacity-desc">Plus grande capacité</option>
-          <option value="rating-desc">Meilleures notes</option>
-        </select>
+        <div class="toolbar-right">
+          <div class="view-toggle">
+            <button class="view-btn active" id="btn-view-grid" onclick="setView('grid')" title="Vue grille">⊞</button>
+            <button class="view-btn" id="btn-view-list" onclick="setView('list')" title="Vue liste">☰</button>
+          </div>
+          <button class="btn-fav-filter" id="btn-fav-filter" onclick="toggleFavFilter()">🤍 Favoris</button>
+          <select id="sort-select" class="sort-select" onchange="applySort()">
+            <option value="">Trier par défaut</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="capacity-desc">Plus grande capacité</option>
+            <option value="rating-desc">Meilleures notes</option>
+          </select>
+        </div>
       </div>
 
       <!-- Gîtes Grid -->
@@ -310,6 +333,24 @@
 
   <!-- JavaScript -->
   <script src="/static/js/app.js"></script>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="bottom-tab-bar" id="bottom-tab-bar">
+    <button class="bottom-tab active" data-tab="search" onclick="switchTab('search')">
+      <span class="bottom-tab-icon">🔍</span>
+      <span class="bottom-tab-label">Gîtes</span>
+      <span class="bottom-tab-badge" id="bottom-badge-gites" style="display:none">0</span>
+    </button>
+    <button class="bottom-tab" data-tab="participants" onclick="switchTab('participants')">
+      <span class="bottom-tab-icon">👨‍👩‍👧‍👦</span>
+      <span class="bottom-tab-label">La Tribu</span>
+      <span class="bottom-tab-badge" id="bottom-badge-participants" style="display:none">0</span>
+    </button>
+    <button class="bottom-tab" data-tab="simulator" onclick="switchTab('simulator')">
+      <span class="bottom-tab-icon">💰</span>
+      <span class="bottom-tab-label">Simulateur</span>
+    </button>
+  </nav>
 </body>
 
 </html>

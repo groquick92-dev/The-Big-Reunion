@@ -1514,3 +1514,330 @@ body {
 path.leaflet-interactive {
   transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1), fill-opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* Améliorations UI                                                           */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Bottom Tab Bar (mobile) ────────────────────────────────────────── */
+.bottom-tab-bar { display: none; }
+
+@media (max-width: 768px) {
+  .bottom-tab-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(15, 23, 42, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--glass-border);
+    padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .bottom-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px 0;
+    transition: var(--transition);
+    position: relative;
+  }
+
+  .bottom-tab.active { color: var(--primary-light); }
+
+  .bottom-tab-icon {
+    font-size: 1.45rem;
+    transition: var(--transition);
+  }
+
+  .bottom-tab.active .bottom-tab-icon {
+    transform: scale(1.15) translateY(-2px);
+  }
+
+  .bottom-tab-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  .bottom-tab-badge {
+    position: absolute;
+    top: 2px;
+    right: calc(50% - 22px);
+    background: var(--accent);
+    color: var(--bg-dark);
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* Compact header on mobile (no tab-nav) */
+  .navbar-inner {
+    flex-direction: row !important;
+    height: 54px !important;
+    padding: 0 1rem !important;
+    gap: 0 !important;
+    justify-content: center !important;
+  }
+
+  /* Hide top tab nav — bottom bar takes over */
+  .tab-nav { display: none !important; }
+
+  /* Push content above bottom bar */
+  .main-content { padding-bottom: 80px !important; }
+
+  /* Toasts above bottom bar */
+  .toast-container { bottom: 74px !important; }
+}
+
+/* ─── 2. Map Toggle Button ──────────────────────────────────────────────── */
+.map-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 14px;
+  margin-bottom: 0.75rem;
+  background: rgba(99, 102, 241, 0.07);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-xs);
+  color: var(--primary-light);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.map-toggle-btn:hover {
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+/* ─── 3. Favorite Button on Gîte Cards ─────────────────────────────────── */
+.btn-fav-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.btn-fav-action:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.35);
+  transform: scale(1.1);
+}
+
+.btn-fav-action.is-fav {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ─── 4. View Toggle (Grid / List) ─────────────────────────────────────── */
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 3px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  padding: 3px;
+}
+
+.view-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: var(--transition);
+  line-height: 1;
+}
+
+.view-btn.active { background: var(--primary); color: white; }
+.view-btn:hover:not(.active) { background: rgba(255, 255, 255, 0.07); color: var(--text-primary); }
+
+/* List view mode */
+.gites-list-view {
+  grid-template-columns: 1fr !important;
+  gap: 0.75rem !important;
+}
+
+.gites-list-view .gite-card { flex-direction: row; }
+
+.gites-list-view .gite-image-wrap {
+  width: 180px;
+  min-width: 180px;
+  height: auto;
+  min-height: 140px;
+}
+
+.gites-list-view .gite-description {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+@media (max-width: 480px) {
+  .gites-list-view .gite-image-wrap {
+    width: 110px;
+    min-width: 110px;
+    min-height: 110px;
+  }
+  .gites-list-view .gite-body { padding: 0.75rem; }
+}
+
+/* Fav filter button */
+.btn-fav-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-fav-filter:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.btn-fav-filter.active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+/* ─── 5. Scraping Progress Bar ──────────────────────────────────────────── */
+.scraping-progress {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+.scraping-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.scraping-progress-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.scraping-step-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.scraping-progress-track {
+  height: 6px;
+  background: var(--bg-surface);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.scraping-progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+.scraping-sources-dots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scraping-source-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  transition: all 0.4s ease;
+}
+
+.scraping-source-dot.pending {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
+.scraping-source-dot.active {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary-light);
+  border-color: var(--primary-light);
+  animation: scrape-pulse 1.2s ease-in-out infinite;
+}
+
+.scraping-source-dot.done {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+@keyframes scrape-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3); }
+  50% { opacity: 0.75; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0); }
+}
