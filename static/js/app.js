@@ -179,7 +179,7 @@ async function initMap() {
   }).addTo(franceMap);
 
   try {
-    const res = await fetch('/static/regions.geojson');
+    const res = await fetch('./static/regions.geojson');
     const geoData = await res.json();
 
     geoJsonLayer = L.geoJSON(geoData, {
