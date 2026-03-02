@@ -21,7 +21,10 @@ let state = {
   currentTab: 'search',
   simulation: null,
   selectedRegions: new Set(),
-  sortBy: ''
+  sortBy: '',
+  viewMode: 'grid',
+  showFavOnly: false,
+  mapVisible: true
 };
 
 // ─── Map Data & Config ──────────────────────────────────────────────────────
@@ -67,7 +70,7 @@ function initTabs() {
 function switchTab(tabName) {
   state.currentTab = tabName;
 
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  document.querySelectorAll('.tab-btn, .bottom-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabName);
   });
 
@@ -360,7 +363,23 @@ function searchGites() {
 
   showLoadingSkeleton();
 
+  const activeSources = Array.from(document.querySelectorAll('.source-chip.active'))
+    .map(b => b.dataset.source).filter(Boolean);
+  showScrapingProgress(activeSources);
+
+  let srcIdx = 0;
+  const srcTimer = setInterval(() => {
+    if (srcIdx < activeSources.length) {
+      updateScrapingProgress(srcIdx, activeSources);
+      srcIdx++;
+    } else {
+      clearInterval(srcTimer);
+    }
+  }, 5000);
+
   loadGites().finally(() => {
+    clearInterval(srcTimer);
+    hideScrapingProgress(activeSources);
     btn.classList.remove('loading');
     btn.innerHTML = '🔍 Lancer la recherche';
     btn.disabled = false;
@@ -442,6 +461,9 @@ function renderGites() {
   const grid = document.getElementById('gites-grid');
   if (!grid) return;
 
+  const favorites = getFavorites();
+  grid.className = `gites-grid${state.viewMode === 'list' ? ' gites-list-view' : ''}`;
+
   // Client-side source filtering
   const activeSources = new Set(
     Array.from(document.querySelectorAll('.source-chip.active'))
@@ -464,6 +486,11 @@ function renderGites() {
     gites = gites.filter(g => matchesAmenity(g, 'handicap', 'pmr', 'accessible', 'mobilité réduite'));
   if (document.getElementById('filter-jardin')?.checked)
     gites = gites.filter(g => matchesAmenity(g, 'jardin', 'terrain', 'parc', 'prairie', 'espace extérieur'));
+
+  // Fav filter
+  if (state.showFavOnly) {
+    gites = gites.filter(g => favorites.has(String(g.id)));
+  }
 
   // Apply sort
   if (state.sortBy === 'price-asc') {
@@ -500,6 +527,7 @@ function renderGites() {
 
   grid.innerHTML = gites.map(gite => {
     const src = SOURCE_INFO[gite.source] || { name: 'Autre', color: '#64748b' };
+    const isFav = favorites.has(String(gite.id));
     const FALLBACK_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop';
     let photoUrl = FALLBACK_IMG;
     if (gite.photo) {
@@ -543,6 +571,7 @@ function renderGites() {
             ${pricePerPersonHtml}
           </div>
           <div class="gite-actions">
+            <button class="btn-fav-action ${isFav ? 'is-fav' : ''}" onclick="toggleFavorite(${gite.id})" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${isFav ? '❤️' : '🤍'}</button>
             <button class="btn-gite btn-gite-primary" onclick="selectGiteForSimulation(${gite.id})">
               💰 Simuler
             </button>
@@ -707,16 +736,16 @@ function renderTribeSummary() {
 }
 
 function updateBadges() {
-  const badge = document.getElementById('badge-participants');
-  if (badge) {
-    badge.textContent = state.totals.total_personnes;
-    badge.style.display = state.totals.total_personnes > 0 ? 'inline-block' : 'none';
-  }
-  const badgeGites = document.getElementById('badge-gites');
-  if (badgeGites) {
-    badgeGites.textContent = state.gites.length;
-    badgeGites.style.display = state.gites.length > 0 ? 'inline-block' : 'none';
-  }
+  const count = state.totals.total_personnes;
+  const countGites = state.gites.length;
+  ['badge-participants', 'bottom-badge-participants'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = count; el.style.display = count > 0 ? 'inline-block' : 'none'; }
+  });
+  ['badge-gites', 'bottom-badge-gites'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = countGites; el.style.display = countGites > 0 ? 'inline-block' : 'none'; }
+  });
 }
 
 // ─── Cost Simulator ─────────────────────────────────────────────────────────
@@ -854,6 +883,136 @@ function renderSimulationResults(data) {
   `;
 }
 
+// ─── Map Toggle ──────────────────────────────────────────────────────────────
+function toggleMap() {
+  state.mapVisible = !state.mapVisible;
+  const wrapper = document.getElementById('map-wrapper');
+  const arrow = document.getElementById('map-toggle-arrow');
+  if (wrapper) {
+    wrapper.style.transition = 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin-top 0.3s ease';
+    wrapper.style.overflow = 'hidden';
+    if (state.mapVisible) {
+      wrapper.style.setProperty('height', '400px', 'important');
+      wrapper.style.marginTop = '1rem';
+    } else {
+      wrapper.style.setProperty('height', '0px', 'important');
+      wrapper.style.marginTop = '0';
+    }
+  }
+  if (arrow) arrow.textContent = state.mapVisible ? '▲' : '▼';
+  if (state.mapVisible && franceMap) {
+    setTimeout(() => franceMap.invalidateSize(), 450);
+  }
+}
+
+// ─── Favorites ───────────────────────────────────────────────────────────────
+function getFavorites() {
+  try { return new Set(JSON.parse(localStorage.getItem('cousinade_favs') || '[]')); }
+  catch { return new Set(); }
+}
+
+function saveFavorites(set) {
+  localStorage.setItem('cousinade_favs', JSON.stringify(Array.from(set)));
+}
+
+function toggleFavorite(id) {
+  const favs = getFavorites();
+  const key = String(id);
+  if (favs.has(key)) {
+    favs.delete(key);
+    showToast('Retiré des favoris', 'info');
+  } else {
+    favs.add(key);
+    showToast('Ajouté aux favoris ❤️', 'success');
+  }
+  saveFavorites(favs);
+  renderGites();
+  updateFavFilterBtn();
+}
+
+function toggleFavFilter() {
+  state.showFavOnly = !state.showFavOnly;
+  updateFavFilterBtn();
+  renderGites();
+}
+
+function updateFavFilterBtn() {
+  const btn = document.getElementById('btn-fav-filter');
+  if (!btn) return;
+  const favCount = getFavorites().size;
+  btn.classList.toggle('active', state.showFavOnly);
+  btn.textContent = state.showFavOnly
+    ? `❤️ Favoris (${favCount})`
+    : `🤍 Favoris${favCount > 0 ? ` (${favCount})` : ''}`;
+}
+
+// ─── View Mode ───────────────────────────────────────────────────────────────
+function setView(mode) {
+  state.viewMode = mode;
+  document.getElementById('btn-view-grid')?.classList.toggle('active', mode === 'grid');
+  document.getElementById('btn-view-list')?.classList.toggle('active', mode === 'list');
+  renderGites();
+}
+
+// ─── Scraping Progress ───────────────────────────────────────────────────────
+const SOURCE_LABELS = {
+  grandsgites: 'GrandsGites',
+  gitesxxl: 'GitesXXL',
+  gigalocation: 'Giga-Location',
+  gitesdefrance: 'Gîtes de France'
+};
+
+function showScrapingProgress(activeSources) {
+  const el = document.getElementById('scraping-progress');
+  if (!el || !activeSources.length) return;
+  el.style.display = 'block';
+  const fill = document.getElementById('scraping-fill');
+  if (fill) fill.style.width = '0%';
+  const step = document.getElementById('scraping-step');
+  if (step) step.textContent = `0 / ${activeSources.length}`;
+  const label = document.getElementById('scraping-label');
+  if (label) label.textContent = '🔍 Connexion aux sources...';
+  const dots = document.getElementById('scraping-dots');
+  if (dots) {
+    dots.innerHTML = activeSources.map(s =>
+      `<span class="scraping-source-dot pending" id="dot-${s}">⏳ ${SOURCE_LABELS[s] || s}</span>`
+    ).join('');
+  }
+}
+
+function updateScrapingProgress(idx, activeSources) {
+  const fill = document.getElementById('scraping-fill');
+  const label = document.getElementById('scraping-label');
+  const step = document.getElementById('scraping-step');
+  if (idx > 0) {
+    const prev = document.getElementById(`dot-${activeSources[idx - 1]}`);
+    if (prev) { prev.className = 'scraping-source-dot done'; prev.textContent = `✅ ${SOURCE_LABELS[activeSources[idx - 1]] || activeSources[idx - 1]}`; }
+  }
+  const cur = document.getElementById(`dot-${activeSources[idx]}`);
+  if (cur) { cur.className = 'scraping-source-dot active'; cur.textContent = `⏳ ${SOURCE_LABELS[activeSources[idx]] || activeSources[idx]}`; }
+  const pct = Math.round((idx / activeSources.length) * 80);
+  if (fill) fill.style.width = `${pct}%`;
+  if (step) step.textContent = `${idx} / ${activeSources.length}`;
+  if (label) label.textContent = `🔍 Scraping ${SOURCE_LABELS[activeSources[idx]] || activeSources[idx]}...`;
+}
+
+function hideScrapingProgress(activeSources) {
+  const fill = document.getElementById('scraping-fill');
+  const label = document.getElementById('scraping-label');
+  const step = document.getElementById('scraping-step');
+  if (fill) fill.style.width = '100%';
+  if (step) step.textContent = `${activeSources.length} / ${activeSources.length}`;
+  if (label) label.textContent = '✅ Terminé !';
+  activeSources.forEach(s => {
+    const dot = document.getElementById(`dot-${s}`);
+    if (dot) { dot.className = 'scraping-source-dot done'; dot.textContent = `✅ ${SOURCE_LABELS[s] || s}`; }
+  });
+  setTimeout(() => {
+    const el = document.getElementById('scraping-progress');
+    if (el) el.style.display = 'none';
+  }, 2000);
+}
+
 // ─── Expose globals for inline handlers ─────────────────────────────────────
 window.renderGites = renderGites;
 window.searchGites = searchGites;
@@ -866,3 +1025,7 @@ window.runSimulation = runSimulation;
 window.removeRegion = removeRegion;
 window.selectAllRegions = selectAllRegions;
 window.applySort = applySort;
+window.toggleMap = toggleMap;
+window.toggleFavorite = toggleFavorite;
+window.toggleFavFilter = toggleFavFilter;
+window.setView = setView;
