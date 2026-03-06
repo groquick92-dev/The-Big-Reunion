@@ -11,6 +11,7 @@ const SOURCE_INFO = {
   gitesxxl: { name: 'GitesXXL', color: '#ec4899' },
   gigalocation: { name: 'Giga-Location', color: '#3b82f6' },
   gitesdefrance: { name: 'Gîtes de France', color: '#059669' },
+  manuel: { name: 'Ajout Manuel', color: '#f59e0b' },
 };
 
 // ─── State ──────────────────────────────────────────────────────────────────
